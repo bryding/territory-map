@@ -83,6 +83,56 @@ The app expects CSV files with sales representative data including:
 
 Currently using manual testing. Unit tests with Vitest planned for Phase 2.
 
-## Deployment
+## PWA Installation on iPhone
 
-See `docs/deployment.md` for PWA deployment instructions and iPhone installation guide.
+### Step 1: Start the Development Server
+```sh
+# On your MacBook Pro
+yarn build
+yarn preview --host
+```
+
+The preview server will start at `http://localhost:4173/` and show your local IP address.
+
+### Step 2: Find Your Local IP Address
+```sh
+# Get your MacBook's local IP address
+ifconfig | grep "inet " | grep -v 127.0.0.1
+```
+
+Look for something like `192.168.1.XXX` or `10.0.0.XXX`.
+
+### Step 3: Access on iPhone
+1. **Connect iPhone to same WiFi** as your MacBook Pro
+2. **Open Safari** on your iPhone
+3. **Navigate to**: `http://YOUR_IP_ADDRESS:4173/` 
+   - Example: `http://192.168.1.105:4173/`
+4. **Load sample data** by tapping "Load Sample Data" or upload your CSV
+
+### Step 4: Install as PWA
+1. **Tap the Share button** (square with arrow) in Safari
+2. **Scroll down and tap "Add to Home Screen"**
+3. **Confirm the name** "Territory Pro" and tap "Add"
+4. **Find the app icon** on your home screen
+
+### Step 5: Test PWA Features
+1. **Launch from home screen** - Opens full-screen without Safari UI
+2. **Test offline** - Close Safari, reopen app from home screen (data persists)
+3. **Test maps** - Tap any customer address to open in iOS Maps
+4. **Test responsiveness** - Optimized for iPhone touch targets
+
+### Alternative: Quick Network Access
+```sh
+# Start with network access in one command
+yarn build && yarn preview --host
+```
+
+Then use the network URL shown in the terminal on your iPhone.
+
+## Deployment Options
+
+For production deployment, consider:
+- **Netlify/Vercel**: Static hosting with automatic PWA support
+- **GitHub Pages**: Free hosting for public repositories  
+- **Firebase Hosting**: Google's hosting with PWA optimization
+- **Your own server**: Any static file server with HTTPS
