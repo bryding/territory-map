@@ -192,23 +192,61 @@ function openMaps() {
 /* iPhone-specific optimizations */
 @media (max-width: 480px) {
   .customer-card {
-    padding: 0.875rem;
-    min-height: 44px; /* iOS touch target minimum */
+    padding: 1.25rem 1rem;
+    min-height: 60px; /* iOS touch target minimum with more breathing room */
   }
   
   .card-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
   }
   
   .account-info {
     flex-wrap: wrap;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .account-name {
+    font-size: 1.1rem;
+    line-height: 1.3;
+  }
+
+  .customer-number {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .total-sales {
+    font-size: 1rem;
+    align-self: flex-start;
+  }
+
+  .address {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
   }
   
   .sales-data {
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .product-sales {
+    font-size: 0.9rem;
+  }
+
+  .notes {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .note {
+    margin-bottom: 0.5rem;
   }
 }
 </style>

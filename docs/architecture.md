@@ -50,9 +50,10 @@ Colorado (6 Quadrants)
 ## Component Architecture
 
 ### Core Components
-- **TerritoryMap** - Main container component (pending)
+- **TerritoryMapView** - Main container component ✅
 - **TerritoryQuadrant** - Individual territory quadrant ✅
 - **CustomerCard** - Customer account details ✅
+- **CSVLoader** - File upload and sample data loading ✅
 - **SearchBar** - Search and filter functionality (pending)
 - **StatsPanel** - Revenue and target statistics (pending)
 

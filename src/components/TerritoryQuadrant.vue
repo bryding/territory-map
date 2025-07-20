@@ -83,4 +83,26 @@ function formatCurrency(amount: number): string {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
+
+/* iPhone optimizations */
+@media (max-width: 480px) {
+  .quadrant-header {
+    padding: 1.25rem 1rem;
+  }
+
+  .quadrant-header h2 {
+    font-size: 1.4rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+  }
+
+  .stats {
+    gap: 1.5rem;
+    font-size: 1rem;
+  }
+
+  .customer-list {
+    max-height: 400px;
+  }
+}
 </style>

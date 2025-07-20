@@ -258,14 +258,87 @@ function clearError() {
 @media (max-width: 480px) {
   .csv-loader {
     padding: 1rem;
+    min-height: 100vh;
+    align-items: flex-start;
+    padding-top: 2rem;
   }
   
   .loader-card {
-    padding: 1.5rem;
+    padding: 2rem 1.5rem;
+    max-width: none;
+    width: 100%;
+    box-shadow: none;
+    border-radius: 16px;
+  }
+
+  .loader-card h2 {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .loader-card p {
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 2rem;
   }
   
   .upload-area {
+    padding: 2.5rem 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 12px;
+  }
+
+  .upload-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .upload-area p {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .upload-area small {
+    font-size: 0.95rem;
+  }
+
+  .sample-button {
+    padding: 1rem;
+    font-size: 1rem;
+    border-radius: 12px;
+    min-height: 48px;
+  }
+
+  .divider {
+    margin: 2rem 0;
+  }
+
+  .divider span {
+    font-size: 1rem;
+    padding: 0 1.5rem;
+  }
+
+  .loading {
+    padding: 2rem 1rem;
+  }
+
+  .loading p {
+    font-size: 1.1rem;
+  }
+
+  .error {
     padding: 1.5rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .clear-button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    min-height: 44px;
+    border-radius: 8px;
   }
 }
 </style>

@@ -171,21 +171,40 @@ onMounted(() => {
 @media (max-width: 480px) {
   .territory-grid {
     grid-template-columns: 1fr;
-    padding: 0.5rem;
-    gap: 0.5rem;
+    padding: 1rem;
+    gap: 1rem;
   }
   
   .app-header {
-    padding: 0.75rem;
+    padding: 1rem 1rem 1.5rem 1rem;
   }
   
   .app-header h1 {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
   }
   
   .header-stats {
-    flex-direction: column;
-    gap: 0.25rem;
+    flex-direction: row;
+    gap: 1rem;
+    font-size: 1rem;
+  }
+
+  .loading, .error, .empty-state {
+    padding: 1rem;
+    min-height: 60vh;
+  }
+
+  .loading p, .error p {
+    font-size: 1.1rem;
+    line-height: 1.4;
+  }
+
+  .retry-button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    min-height: 44px;
+    border-radius: 8px;
   }
 }
 </style>

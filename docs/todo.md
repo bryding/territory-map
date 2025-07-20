@@ -9,12 +9,14 @@
 - [x] ~~Create TypeScript interfaces for Customer, Sales, Territory data~~
 - [x] ~~Implement CSV parsing with Papa Parse and validation~~
 - [x] ~~Setup Pinia store for territory and customer data management~~
+- [x] ~~Test core app functionality and fix TypeScript errors~~
 
 ### Medium Priority (Current Sprint)
-- [ ] Create territory quadrant components (Colorado Springs North/South/Central, Highlands Ranch, Littleton, Castle Rock)
-- [ ] Create customer card components with address, CN, sales data, and notes
+- [x] ~~Create CSV file loader with drag-and-drop and sample data~~
+- [x] ~~Create territory quadrant components (Colorado Springs North/South/Central, Highlands Ranch, Littleton, Castle Rock)~~
+- [x] ~~Create customer card components with address, CN, sales data, and notes~~
+- [x] ~~Implement maps integration for iOS Maps and Google Maps with fallback~~
 - [ ] Add special symbol for Q3 Promo target accounts
-- [ ] Implement maps integration for iOS Maps and Google Maps with fallback
 - [ ] Implement search/filter functionality with debouncing
 - [ ] Create PWA manifest with proper icons and metadata
 - [ ] Implement service worker for offline functionality
