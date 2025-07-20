@@ -1,0 +1,191 @@
+<template>
+  <div class="territory-map-view">
+    <header class="app-header">
+      <h1>Territory Call Map</h1>
+      <div v-if="!loading && customers.length > 0" class="header-stats">
+        <span>{{ customers.length }} customers</span>
+        <span>${{ formatCurrency(totalSales) }}</span>
+      </div>
+    </header>
+
+    <div v-if="loading" class="loading">
+      <div class="loading-spinner"></div>
+      <p>Loading territory data...</p>
+    </div>
+
+    <div v-else-if="error" class="error">
+      <p>{{ error }}</p>
+      <button @click="retryLoad" class="retry-button">Retry</button>
+    </div>
+
+    <div v-else-if="customers.length === 0" class="empty-state">
+      <p>No customer data available.</p>
+      <p>Please load CSV data to continue.</p>
+    </div>
+
+    <div v-else class="territory-grid">
+      <TerritoryQuadrant
+        v-for="territory in territories"
+        :key="territory"
+        :territory="territory"
+        :customers="getCustomersByTerritory(territory)"
+      />
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed, onMounted } from 'vue'
+import type { Territory } from '@/types'
+import { useTerritoryStore } from '@/stores/territory'
+import TerritoryQuadrant from '@/components/TerritoryQuadrant.vue'
+
+const territoryStore = useTerritoryStore()
+
+// Territory order for display
+const territories: Territory[] = [
+  'colorado-springs-north',
+  'colorado-springs-central', 
+  'colorado-springs-south',
+  'highlands-ranch',
+  'littleton',
+  'castle-rock'
+]
+
+const customers = computed(() => territoryStore.customers)
+const loading = computed(() => territoryStore.loading)
+const error = computed(() => territoryStore.error)
+
+const totalSales = computed(() => {
+  return customers.value.reduce((sum, customer) => sum + customer.totalSales, 0)
+})
+
+function getCustomersByTerritory(territory: Territory) {
+  return territoryStore.getCustomersByTerritory(territory)
+}
+
+function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat('en-US').format(amount)
+}
+
+async function retryLoad() {
+  // Try to load from storage first
+  if (!territoryStore.loadFromStorage()) {
+    // If no stored data, would need to reload CSV
+    // For now, just clear the error
+    territoryStore.clearData()
+  }
+}
+
+onMounted(() => {
+  // Try to load data from localStorage on app start
+  if (customers.value.length === 0) {
+    territoryStore.loadFromStorage()
+  }
+})
+</script>
+
+<style scoped>
+.territory-map-view {
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+.app-header {
+  background: white;
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.app-header h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.header-stats {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.loading, .error, .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  padding: 2rem;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e5e7eb;
+  border-top: 3px solid #2563eb;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error {
+  color: #dc2626;
+}
+
+.retry-button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.retry-button:hover {
+  background: #1d4ed8;
+}
+
+.territory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* iPhone-specific optimizations */
+@media (max-width: 480px) {
+  .territory-grid {
+    grid-template-columns: 1fr;
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+  
+  .app-header {
+    padding: 0.75rem;
+  }
+  
+  .app-header h1 {
+    font-size: 1.25rem;
+  }
+  
+  .header-stats {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+</style>
