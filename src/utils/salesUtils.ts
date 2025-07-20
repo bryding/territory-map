@@ -100,7 +100,7 @@ export class CSVQuarterDetector {
    * Detects if a column name represents a quarter
    */
   static isQuarterColumn(columnName: string): boolean {
-    return this.QUARTER_PATTERNS.some(pattern => pattern.test(columnName.trim()))
+    return this.parseQuarterColumn(columnName) !== null
   }
 
   /**
