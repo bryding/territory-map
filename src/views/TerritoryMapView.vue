@@ -9,9 +9,28 @@
           {{ reloading ? 'Reloading...' : 'Reload Data' }}
         </button>
       </div>
+      
+      <div v-if="!loading && customers.length > 0" class="territory-filter">
+        <label for="territory-select" class="filter-label">Territory:</label>
+        <select 
+          id="territory-select" 
+          v-model="selectedTerritory" 
+          class="territory-select"
+        >
+          <option value="">All Territories</option>
+          <option 
+            v-for="territory in availableTerritories" 
+            :key="territory" 
+            :value="territory"
+          >
+            {{ formatTerritoryName(territory) }} ({{ getCustomersByTerritory(territory).length }})
+          </option>
+        </select>
+      </div>
+      
       <div v-if="!loading && customers.length > 0" class="header-stats">
-        <span>{{ customers.length }} customers</span>
-        <span>${{ formatCurrency(totalSales) }}</span>
+        <span>{{ filteredCustomers.length }} customers</span>
+        <span>${{ formatCurrency(filteredTotalSales) }}</span>
       </div>
     </header>
 
@@ -29,13 +48,17 @@
       <CSVLoader />
     </div>
 
-    <div v-else class="territory-grid">
-      <TerritoryQuadrant
-        v-for="territory in territories"
-        :key="territory"
-        :territory="territory"
-        :customers="getCustomersByTerritory(territory)"
-      />
+    <div v-else class="customer-list">
+      <div v-if="filteredCustomers.length === 0" class="no-customers">
+        <p>No customers found{{ selectedTerritory ? ` in ${formatTerritoryName(selectedTerritory)}` : '' }}</p>
+      </div>
+      <div v-else class="customers-grid">
+        <CustomerCard
+          v-for="customer in filteredCustomers"
+          :key="customer.id"
+          :customer="customer"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -44,12 +67,13 @@
 import { computed, onMounted, ref } from 'vue'
 import type { Territory } from '@/types'
 import { useTerritoryStore } from '@/stores/territory'
-import TerritoryQuadrant from '@/components/TerritoryQuadrant.vue'
+import CustomerCard from '@/components/CustomerCard.vue'
 import CSVLoader from '@/components/CSVLoader.vue'
 import { loadTestData } from '@/utils/testData'
 
 const territoryStore = useTerritoryStore()
 const reloading = ref(false)
+const selectedTerritory = ref<Territory | ''>('')
 
 // Territory order for display
 const territories: Territory[] = [
@@ -65,12 +89,40 @@ const customers = computed(() => territoryStore.customers)
 const loading = computed(() => territoryStore.loading)
 const error = computed(() => territoryStore.error)
 
-const totalSales = computed(() => {
-  return customers.value.reduce((sum, customer) => sum + customer.totalSales, 0)
+// Get territories that actually have customers
+const availableTerritories = computed(() => {
+  return territories.filter(territory => 
+    territoryStore.getCustomersByTerritory(territory).length > 0
+  )
+})
+
+// Filtered customers based on selected territory
+const filteredCustomers = computed(() => {
+  if (!selectedTerritory.value) {
+    return customers.value
+  }
+  return territoryStore.getCustomersByTerritory(selectedTerritory.value)
+})
+
+// Total sales for filtered customers
+const filteredTotalSales = computed(() => {
+  return filteredCustomers.value.reduce((sum, customer) => sum + customer.totalSales, 0)
 })
 
 function getCustomersByTerritory(territory: Territory) {
   return territoryStore.getCustomersByTerritory(territory)
+}
+
+function formatTerritoryName(territory: Territory): string {
+  const names: Record<Territory, string> = {
+    'colorado-springs-north': 'Colorado Springs North',
+    'colorado-springs-central': 'Colorado Springs Central',
+    'colorado-springs-south': 'Colorado Springs South',
+    'highlands-ranch': 'Highlands Ranch',
+    'littleton': 'Littleton',
+    'castle-rock': 'Castle Rock'
+  }
+  return names[territory]
 }
 
 function formatCurrency(amount: number): string {
@@ -220,21 +272,83 @@ onMounted(() => {
   background: #1d4ed8;
 }
 
-.territory-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1rem;
+.territory-filter {
+  padding: 0 1rem 1rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.filter-label {
+  font-weight: 500;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.territory-select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  color: #374151;
+  font-size: 0.875rem;
+  min-width: 200px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.territory-select:hover {
+  border-color: #9ca3af;
+}
+
+.territory-select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.customer-list {
   padding: 1rem;
+}
+
+.no-customers {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+}
+
+.customers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1rem;
   max-width: 1200px;
   margin: 0 auto;
 }
 
 /* iPhone-specific optimizations */
 @media (max-width: 480px) {
-  .territory-grid {
+  .customers-grid {
     grid-template-columns: 1fr;
-    padding: 1rem;
+    padding: 0;
     gap: 1rem;
+  }
+  
+  .territory-filter {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+  
+  .filter-label {
+    font-size: 1rem;
+  }
+  
+  .territory-select {
+    min-width: auto;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border-radius: 8px;
   }
   
   .app-header {

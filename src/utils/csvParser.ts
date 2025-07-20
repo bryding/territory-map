@@ -213,6 +213,9 @@ export class CSVParser {
     const firstRow = rows[0]
     const customerNumber = customerKey
     const rawAccountName = firstRow.accountName || firstRow.accountname
+    if (!rawAccountName) {
+      return null // Skip rows without account names
+    }
     const accountName = this.cleanAccountName(rawAccountName)
     
     // Aggregate sales data by brand
