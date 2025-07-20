@@ -21,6 +21,7 @@ export interface ParseMeta {
   quarterColumns: Array<{ original: string; standardized: string }>
 }
 
+
 export class CSVParser {
   private static readonly REQUIRED_COLUMNS = ['PAC', 'Brand'] as const
   private static readonly KNOWN_SALES_REPS = [
@@ -49,7 +50,12 @@ export class CSVParser {
         transformHeader: (header) => this.normalizeHeader(header),
         transform: (value) => value.trim(),
         complete: (results) => {
-          const meta = this.analyzeMeta(results.meta?.fields || [])
+          const quarterColumns = CSVQuarterDetector.getQuarterColumns(results.meta?.fields || [])
+          const meta: ParseMeta = {
+            totalRows: 0, // Will be set later
+            validRows: 0, // Will be set later  
+            quarterColumns
+          }
           
           // Validate required columns exist
           const missingColumns = this.validateRequiredColumns(results.meta?.fields || [])
@@ -68,7 +74,7 @@ export class CSVParser {
           
           for (const [customerKey, rows] of customerGroups.entries()) {
             try {
-              const customer = this.processCustomerGroup(customerKey, rows, meta.quarterColumns)
+              const customer = this.processCustomerGroup(customerKey, rows, quarterColumns)
               if (customer) {
                 customers.push(customer)
               }
@@ -81,17 +87,16 @@ export class CSVParser {
             }
           }
 
+          meta.totalRows = results.data.length
+          meta.validRows = customers.length
+
           resolve({
             data: customers,
             errors,
-            meta: {
-              ...meta,
-              totalRows: results.data.length,
-              validRows: customers.length
-            }
+            meta
           })
         },
-        error: (error) => {
+        error: (error: any) => {
           resolve({
             data: [],
             errors: [{ row: 0, message: error.message, code: 'PARSE_ERROR' }],
@@ -119,13 +124,6 @@ export class CSVParser {
     )
   }
 
-  /**
-   * Analyzes CSV metadata including quarter columns
-   */
-  private static analyzeMeta(headers: string[]): Pick<ParseMeta, 'quarterColumns'> {
-    const quarterColumns = CSVQuarterDetector.getQuarterColumns(headers)
-    return { quarterColumns }
-  }
 
   /**
    * Groups CSV rows by customer (account name)
@@ -166,7 +164,8 @@ export class CSVParser {
       if (!groups.has(customerKey)) {
         groups.set(customerKey, [])
       }
-      groups.get(customerKey)!.push({ ...row, rowIndex: index + 2 })
+      const rowWithIndex = Object.assign({}, row, { rowIndex: index + 2 }) as CSVRow & { rowIndex: number }
+      groups.get(customerKey)!.push(rowWithIndex)
     })
 
     return groups

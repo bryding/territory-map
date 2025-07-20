@@ -127,9 +127,9 @@ export const useTerritoryStore = defineStore('territory', () => {
 
   return {
     // State
-    customers: readonly(customers),
-    loading: readonly(loading),
-    error: readonly(error),
+    customers,
+    loading,
+    error,
     
     // Computed
     customersByTerritory,

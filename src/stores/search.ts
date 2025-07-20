@@ -82,9 +82,9 @@ export const useSearchStore = defineStore('search', () => {
 
   return {
     // State
-    query: readonly(query),
-    filters: readonly(filters),
-    isSearching: readonly(isSearching),
+    query,
+    filters,
+    isSearching,
     
     // Computed
     results,
