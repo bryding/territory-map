@@ -19,8 +19,7 @@
     </div>
 
     <div v-else-if="customers.length === 0" class="empty-state">
-      <p>No customer data available.</p>
-      <p>Please load CSV data to continue.</p>
+      <CSVLoader />
     </div>
 
     <div v-else class="territory-grid">
@@ -39,6 +38,7 @@ import { computed, onMounted } from 'vue'
 import type { Territory } from '@/types'
 import { useTerritoryStore } from '@/stores/territory'
 import TerritoryQuadrant from '@/components/TerritoryQuadrant.vue'
+import CSVLoader from '@/components/CSVLoader.vue'
 
 const territoryStore = useTerritoryStore()
 
