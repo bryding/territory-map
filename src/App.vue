@@ -1,18 +1,25 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useTerritoryStore } from '@/stores/territory'
 
 const territoryStore = useTerritoryStore()
+const baseUrl = ref(import.meta.env.BASE_URL)
+const environment = ref(import.meta.env.MODE)
 
 onMounted(() => {
   // Try to load data from localStorage on app startup
   territoryStore.loadFromStorage()
+  console.log('App mounted, base URL:', import.meta.env.BASE_URL)
+  console.log('Environment:', import.meta.env.MODE)
 })
 </script>
 
 <template>
   <div id="app">
+    <h1>Territory Pro - Debug</h1>
+    <p>Base URL: {{ baseUrl }}</p>
+    <p>Environment: {{ environment }}</p>
     <RouterView />
   </div>
 </template>
