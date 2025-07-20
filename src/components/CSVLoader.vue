@@ -230,6 +230,8 @@ function clearError() {
   color: #6b7280;
   padding: 0 1rem;
   font-size: 0.875rem;
+  position: relative;
+  z-index: 1;
 }
 
 .sample-button {
