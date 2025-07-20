@@ -28,7 +28,8 @@ export async function loadTestData() {
       try {
         // Always use cache busting for reliable reloads
         const cacheBuster = `?t=${Date.now()}&r=${Math.random()}`
-        const url = `/data/${filename}${cacheBuster}`
+        const baseUrl = import.meta.env.BASE_URL
+        const url = `${baseUrl}data/${filename}${cacheBuster}`
         
         console.log(`📥 Attempting to load CSV data from: ${url}`)
         
