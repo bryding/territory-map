@@ -32,15 +32,27 @@
         </div>
       </div>
       
-      <div v-if="hasNotes" class="notes">
-        <div v-if="customer.notes.general" class="note">
-          <strong>Notes:</strong> {{ customer.notes.general }}
-        </div>
-        <div v-if="customer.notes.contact" class="note">
-          <strong>Contact:</strong> {{ customer.notes.contact }}
-        </div>
-        <div v-if="customer.notes.product" class="note">
-          <strong>Products:</strong> {{ customer.notes.product }}
+      <div v-if="hasNotes" class="notes-section">
+        <button 
+          @click.stop="toggleNotes" 
+          class="notes-toggle"
+          :class="{ 'expanded': notesExpanded }"
+        >
+          <span class="notes-icon">{{ notesExpanded ? '📝' : '💬' }}</span>
+          <span class="notes-label">Notes</span>
+          <span class="expand-icon">{{ notesExpanded ? '▼' : '▶' }}</span>
+        </button>
+        
+        <div v-show="notesExpanded" class="notes-content">
+          <div v-if="customer.notes.general" class="note">
+            <strong>General:</strong> {{ customer.notes.general }}
+          </div>
+          <div v-if="customer.notes.contact" class="note">
+            <strong>Contact:</strong> {{ customer.notes.contact }}
+          </div>
+          <div v-if="customer.notes.product" class="note">
+            <strong>SkinPen:</strong> {{ customer.notes.product }}
+          </div>
         </div>
       </div>
     </div>
@@ -48,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import type { Customer } from '@/types'
 import { SalesUtils } from '@/utils/salesUtils'
 import { openInMaps } from '@/utils/maps'
@@ -59,6 +71,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const notesExpanded = ref(false)
 
 const hasNotes = computed(() => {
   return !!(props.customer.notes.general || props.customer.notes.contact || props.customer.notes.product)
@@ -66,6 +79,10 @@ const hasNotes = computed(() => {
 
 function openMaps() {
   openInMaps(props.customer.businessAddress)
+}
+
+function toggleNotes() {
+  notesExpanded.value = !notesExpanded.value
 }
 </script>
 
@@ -164,18 +181,68 @@ function openMaps() {
   margin-left: 0.25rem;
 }
 
-.notes {
-  font-size: 0.75rem;
+.notes-section {
+  margin-top: 0.75rem;
+}
+
+.notes-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  padding: 0.5rem 0;
+  cursor: pointer;
+  font-size: 0.875rem;
   color: #6b7280;
-  space-y: 0.25rem;
+  width: 100%;
+  text-align: left;
+  transition: color 0.2s;
+  min-height: 44px; /* iOS touch target */
+}
+
+.notes-toggle:hover {
+  color: #374151;
+}
+
+.notes-toggle.expanded {
+  color: #2563eb;
+}
+
+.notes-icon {
+  font-size: 1rem;
+}
+
+.notes-label {
+  flex: 1;
+  font-weight: 500;
+}
+
+.expand-icon {
+  font-size: 0.75rem;
+  transition: transform 0.2s;
+}
+
+.notes-content {
+  padding: 0.5rem 0 0.75rem 0;
+  border-top: 1px solid #f3f4f6;
+  margin-top: 0.5rem;
 }
 
 .note {
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.note:last-child {
+  margin-bottom: 0;
 }
 
 .note strong {
   color: #374151;
+  font-weight: 600;
 }
 
 /* iPhone-specific optimizations */
@@ -229,13 +296,24 @@ function openMaps() {
     font-size: 0.9rem;
   }
 
-  .notes {
-    font-size: 0.9rem;
-    line-height: 1.4;
+  .notes-toggle {
+    font-size: 1rem;
+    padding: 0.75rem 0;
+    min-height: 44px;
+  }
+  
+  .notes-content {
+    padding: 0.75rem 0;
   }
 
   .note {
-    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    line-height: 1.4;
+    margin-bottom: 0.75rem;
+  }
+  
+  .note:last-child {
+    margin-bottom: 0;
   }
 }
 </style>
