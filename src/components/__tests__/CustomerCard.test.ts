@@ -182,14 +182,29 @@ describe('CustomerCard Component', () => {
   })
 
   describe('Notes Display', () => {
-    it('should display customer notes when present', () => {
+    it('should display customer notes when present', async () => {
       const wrapper = mount(CustomerCard, {
         props: { customer: mockCustomer }
       })
 
-      // Should show notes section
-      const notesSection = wrapper.find('.notes')
+      // Should show notes section with toggle button
+      const notesSection = wrapper.find('.notes-section')
       expect(notesSection.exists()).toBe(true)
+      
+      // Should show notes toggle button
+      const notesToggle = wrapper.find('.notes-toggle')
+      expect(notesToggle.exists()).toBe(true)
+      expect(notesToggle.text()).toContain('Notes')
+      
+      // Notes content should exist but not be visible initially
+      const notesContent = wrapper.find('.notes-content')
+      expect(notesContent.exists()).toBe(true)
+      
+      // Click to expand notes
+      await notesToggle.trigger('click')
+      
+      // Notes content should now be displayed
+      await wrapper.vm.$nextTick()
       expect(wrapper.text()).toContain('Good customer relationship')
       expect(wrapper.text()).toContain('Prefers email contact')
       expect(wrapper.text()).toContain('Interested in SkinPen expansion')
@@ -202,9 +217,13 @@ describe('CustomerCard Component', () => {
 
       // Should not crash when no notes present
       expect(wrapper.exists()).toBe(true)
+      
+      // Should not show notes section when no notes exist
+      const notesSection = wrapper.find('.notes-section')
+      expect(notesSection.exists()).toBe(false)
     })
 
-    it('should display different types of notes separately', () => {
+    it('should display different types of notes separately', async () => {
       const wrapper = mount(CustomerCard, {
         props: { customer: mockCustomer }
       })
@@ -213,7 +232,15 @@ describe('CustomerCard Component', () => {
       expect(mockCustomer.notes.general).toBe('Good customer relationship')
       expect(mockCustomer.notes.contact).toBe('Prefers email contact')
       expect(mockCustomer.notes.product).toBe('Interested in SkinPen expansion')
-      expect(wrapper.exists()).toBe(true)
+      
+      // Expand notes to check categorization
+      const notesToggle = wrapper.find('.notes-toggle')
+      await notesToggle.trigger('click')
+      
+      // Check that different note types are labeled correctly
+      expect(wrapper.text()).toContain('General:')
+      expect(wrapper.text()).toContain('Contact:')
+      expect(wrapper.text()).toContain('SkinPen:')
     })
   })
 
