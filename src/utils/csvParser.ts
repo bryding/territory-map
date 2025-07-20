@@ -317,9 +317,20 @@ export class CSVParser {
     const notes: CustomerNotes = {}
     
     for (const row of rows) {
-      if (row.notes1) notes.general = row.notes1
-      if (row.notes2) notes.contact = row.notes2
-      if (row.notes3) notes.product = row.notes3
+      // Map CSV fields to note types
+      if (row.notes) notes.general = row.notes.trim()
+      if (row.next_steps) notes.contact = row.next_steps.trim()
+      if (row.skinpen_notes) notes.product = row.skinpen_notes.trim()
+      
+      // Also check for contact field
+      if (row.contact) {
+        const contactInfo = row.contact.trim()
+        if (contactInfo) {
+          notes.contact = notes.contact 
+            ? `${notes.contact}. Contact: ${contactInfo}`
+            : `Contact: ${contactInfo}`
+        }
+      }
     }
 
     return notes
