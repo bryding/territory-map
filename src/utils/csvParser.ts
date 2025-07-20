@@ -111,7 +111,11 @@ export class CSVParser {
    * Normalizes CSV headers to consistent format
    */
   private static normalizeHeader(header: string): string {
-    return header.trim().toLowerCase().replace(/[^a-z0-9]/g, '_')
+    const normalized = header.trim().toLowerCase().replace(/[^a-z0-9]/g, '_')
+    // Map specific CSV columns to expected names
+    if (normalized === 'i') return 'accountName'
+    if (normalized === 'address') return 'address'
+    return normalized
   }
 
   /**
@@ -136,7 +140,8 @@ export class CSVParser {
     
     rows.forEach((row, index) => {
       // Skip total rows and empty rows
-      if (this.isTotalRow(row) || !row.pac || !row.accountName) {
+      const accountName = row.accountName || row.accountname
+      if (this.isTotalRow(row) || !row.pac || !accountName) {
         return
       }
 
@@ -150,12 +155,12 @@ export class CSVParser {
         })
       }
 
-      const customerKey = this.extractCustomerKey(row.accountName)
+      const customerKey = this.extractCustomerKey(accountName)
       if (!customerKey) {
         errors.push({
           row: index + 2,
           field: 'accountName',
-          message: `Could not extract customer number from: ${row.accountName}`,
+          message: `Could not extract customer number from: ${accountName}`,
           code: 'INVALID_CUSTOMER_NUMBER'
         })
         return
@@ -175,7 +180,8 @@ export class CSVParser {
    * Checks if a row represents a total/summary row
    */
   private static isTotalRow(row: CSVRow): boolean {
-    return row.accountName?.toLowerCase().includes('total') || false
+    const accountName = row.accountName || row.accountname
+    return accountName?.toLowerCase().includes('total') || false
   }
 
   /**
@@ -205,7 +211,8 @@ export class CSVParser {
 
     const firstRow = rows[0]
     const customerNumber = customerKey
-    const accountName = this.cleanAccountName(firstRow.accountName)
+    const rawAccountName = firstRow.accountName || firstRow.accountname
+    const accountName = this.cleanAccountName(rawAccountName)
     
     // Aggregate sales data by brand
     const salesByBrand = new Map<ProductBrand, QuarterlySales>()
@@ -234,20 +241,22 @@ export class CSVParser {
     const totalSales = Array.from(salesByBrand.values())
       .reduce((sum, sales) => sum + SalesUtils.getTotalSales(sales), 0)
 
+    const businessAddress = firstRow.address || this.extractBusinessAddress(accountName)
+    
     return {
       id: customerNumber.toLowerCase(),
       customerNumber,
       accountName,
-      businessAddress: this.extractBusinessAddress(accountName), // TODO: Implement address extraction
+      businessAddress,
       salesRep: firstRow.pac,
-      territory: this.inferTerritory(accountName), // TODO: Implement territory inference
+      territory: this.inferTerritory(accountName, firstRow.address),
       notes,
       salesData: {
         daxxify: salesByBrand.get('DAXXIFY') || { salesByPeriod: {} },
         rha: salesByBrand.get('RHA') || { salesByPeriod: {} },
         skinPen: salesByBrand.get('SkinPen') || { salesByPeriod: {} }
       },
-      isQ3PromoTarget: this.determineQ3PromoTarget(rows), // TODO: Implement Q3 promo logic
+      isQ3PromoTarget: this.determineQ3PromoTarget(rows),
       totalSales
     }
   }
@@ -333,12 +342,46 @@ export class CSVParser {
   }
 
   /**
-   * Placeholder: Infer territory from account name/address
-   * TODO: Implement proper territory mapping logic
+   * Infer territory from business address
    */
-  private static inferTerritory(accountName: string): Territory {
-    // Simplified logic - in real implementation this would use
-    // address geocoding or manual territory mapping
+  private static inferTerritory(accountName: string, address?: string): Territory {
+    if (!address) {
+      // Fallback to hash-based distribution if no address
+      const territories: Territory[] = [
+        'colorado-springs-north',
+        'colorado-springs-central', 
+        'colorado-springs-south',
+        'highlands-ranch',
+        'littleton',
+        'castle-rock'
+      ]
+      const hash = accountName.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0)
+      return territories[hash % territories.length]
+    }
+
+    const addressLower = address.toLowerCase()
+    
+    // Map based on address content
+    if (addressLower.includes('highlands ranch')) return 'highlands-ranch'
+    if (addressLower.includes('littleton')) return 'littleton'
+    if (addressLower.includes('castle rock') || addressLower.includes('castle pines')) return 'castle-rock'
+    
+    // Colorado Springs territory mapping based on common area indicators
+    if (addressLower.includes('colorado springs')) {
+      if (addressLower.includes('academy') || addressLower.includes('austin bluffs') || 
+          addressLower.includes('research') || addressLower.includes('80918') || 
+          addressLower.includes('80920')) {
+        return 'colorado-springs-north'
+      }
+      if (addressLower.includes('nevada') || addressLower.includes('80907') || 
+          addressLower.includes('downtown') || addressLower.includes('tejon')) {
+        return 'colorado-springs-central'
+      }
+      // Default to south for other Colorado Springs addresses
+      return 'colorado-springs-south'
+    }
+    
+    // Default fallback
     return 'colorado-springs-central'
   }
 

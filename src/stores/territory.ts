@@ -84,6 +84,10 @@ export const useTerritoryStore = defineStore('territory', () => {
         console.warn('CSV parsing warnings:', result.errors)
       }
       
+      if (result.data.length === 0) {
+        throw new Error(`No customers parsed from CSV. Errors: ${result.errors.map(e => e.message).join(', ')}`)
+      }
+      
       customers.value = result.data
       
       // Store in localStorage for offline access

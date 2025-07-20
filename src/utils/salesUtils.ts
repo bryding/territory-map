@@ -90,10 +90,10 @@ export class SalesUtils {
 export class CSVQuarterDetector {
   // Patterns for detecting quarter columns in various formats
   private static readonly QUARTER_PATTERNS = [
-    /^(\d{1})Q(\d{2})$/,           // "2Q24", "3Q24" (current format)
-    /^Q(\d{1})\s*(\d{4})$/,       // "Q2 2024", "Q3 2024" 
-    /^(\d{4})-Q(\d{1})$/,         // "2024-Q2", "2024-Q3"
-    /^(\d{4})Q(\d{1})$/,          // "2024Q2", "2024Q3"
+    /^(\d{1})[Qq](\d{2})$/,        // "2Q24", "3Q24", "2q24", "3q24" (current format)
+    /^[Qq](\d{1})\s*(\d{4})$/,     // "Q2 2024", "Q3 2024", "q2 2024"
+    /^(\d{4})-[Qq](\d{1})$/,       // "2024-Q2", "2024-Q3", "2024-q2"
+    /^(\d{4})[Qq](\d{1})$/,        // "2024Q2", "2024Q3", "2024q2"
   ]
 
   /**
@@ -110,24 +110,25 @@ export class CSVQuarterDetector {
     const trimmed = columnName.trim()
     
     // Try each pattern
-    for (const pattern of this.QUARTER_PATTERNS) {
+    for (let i = 0; i < this.QUARTER_PATTERNS.length; i++) {
+      const pattern = this.QUARTER_PATTERNS[i]
       const match = trimmed.match(pattern)
       if (match) {
         const [, first, second] = match
         
-        // Determine year and quarter based on pattern
+        // Determine year and quarter based on pattern index
         let year: number, quarter: number
         
-        if (pattern.source.includes('Q.*\\d{2}')) {
-          // Format like "2Q24" - first is quarter, second is 2-digit year
+        if (i === 0) {
+          // Pattern 0: /^(\d{1})[Qq](\d{2})$/ - "2q24" format
           quarter = parseInt(first, 10)
           year = 2000 + parseInt(second, 10)
-        } else if (pattern.source.includes('Q.*\\d{4}')) {
-          // Format like "Q2 2024" - first is quarter, second is 4-digit year
+        } else if (i === 1) {
+          // Pattern 1: /^[Qq](\d{1})\s*(\d{4})$/ - "Q2 2024" format
           quarter = parseInt(first, 10)
           year = parseInt(second, 10)
         } else {
-          // Format like "2024-Q2" - first is year, second is quarter
+          // Pattern 2,3: year-quarter formats - "2024-Q2", "2024Q2"
           year = parseInt(first, 10)
           quarter = parseInt(second, 10)
         }

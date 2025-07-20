@@ -16,6 +16,10 @@ export async function loadTestData() {
     const csvText = await response.text()
     await territoryStore.loadFromCSV(csvText)
     
+    if (territoryStore.customers.length === 0) {
+      throw new Error('No customers were parsed from CSV data')
+    }
+    
     console.log('✅ Test data loaded successfully!')
     return true
   } catch (error) {

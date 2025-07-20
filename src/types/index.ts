@@ -49,6 +49,7 @@ export interface SalesRepresentative {
 export interface CSVRow {
   pac: string
   accountName: string
+  address?: string
   notes1?: string
   notes2?: string
   notes3?: string
