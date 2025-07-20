@@ -3,11 +3,21 @@
     <header class="app-header">
       <div class="header-top">
         <h1>Territory Call Map</h1>
-        <button v-if="!loading && customers.length > 0" @click="reloadData" class="reload-button" :disabled="reloading">
-          <span v-if="reloading">🔄</span>
-          <span v-else>🔄</span>
-          {{ reloading ? 'Reloading...' : 'Reload Data' }}
-        </button>
+        <div v-if="!loading && customers.length > 0" class="menu-container">
+          <button @click="toggleMenu" class="menu-button" :class="{ active: menuOpen }">
+            <div class="hamburger-lines">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </button>
+          <div v-if="menuOpen" class="dropdown-menu">
+            <button @click="reloadData" class="menu-item" :disabled="reloading">
+              <span class="menu-icon">🔄</span>
+              {{ reloading ? 'Reloading...' : 'Reload Data' }}
+            </button>
+          </div>
+        </div>
       </div>
       
       <div v-if="!loading && customers.length > 0" class="territory-filter">
@@ -64,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import type { Territory } from '@/types'
 import { useTerritoryStore } from '@/stores/territory'
 import CustomerCard from '@/components/CustomerCard.vue'
@@ -74,6 +84,7 @@ import { loadTestData } from '@/utils/testData'
 const territoryStore = useTerritoryStore()
 const reloading = ref(false)
 const selectedTerritory = ref<Territory | ''>('')
+const menuOpen = ref(false)
 
 // Territory order for display
 const territories: Territory[] = [
@@ -138,7 +149,21 @@ async function retryLoad() {
   }
 }
 
+function toggleMenu() {
+  menuOpen.value = !menuOpen.value
+}
+
+function handleClickOutside(event: Event) {
+  if (menuOpen.value && event.target) {
+    const target = event.target as Element
+    if (!target.closest('.menu-container')) {
+      menuOpen.value = false
+    }
+  }
+}
+
 async function reloadData() {
+  menuOpen.value = false // Close menu when action is triggered
   reloading.value = true
   try {
     console.log('🔄 Reloading data...')
@@ -160,6 +185,14 @@ onMounted(() => {
   if (customers.value.length === 0) {
     territoryStore.loadFromStorage()
   }
+  
+  // Add click outside handler
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  // Clean up event listener
+  document.removeEventListener('click', handleClickOutside)
 })
 </script>
 
@@ -192,33 +225,100 @@ onMounted(() => {
   color: #111827;
 }
 
-.reload-button {
+.menu-container {
+  position: relative;
+}
+
+.menu-button {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
   background: #f3f4f6;
-  color: #374151;
   border: 1px solid #d1d5db;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 0.875rem;
-  font-weight: 500;
   transition: all 0.2s;
 }
 
-.reload-button:hover:not(:disabled) {
+.menu-button:hover {
   background: #e5e7eb;
   border-color: #9ca3af;
 }
 
-.reload-button:disabled {
+.menu-button.active {
+  background: #e5e7eb;
+}
+
+.hamburger-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.hamburger-lines span {
+  width: 18px;
+  height: 2px;
+  background: #374151;
+  transition: all 0.2s;
+}
+
+.menu-button.active .hamburger-lines span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.menu-button.active .hamburger-lines span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-button.active .hamburger-lines span:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  z-index: 20;
+  min-width: 150px;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #374151;
+  transition: background 0.2s;
+}
+
+.menu-item:hover:not(:disabled) {
+  background: #f3f4f6;
+}
+
+.menu-item:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.reload-button:disabled span {
+.menu-item:disabled .menu-icon {
   animation: spin 1s linear infinite;
+}
+
+.menu-icon {
+  font-size: 1rem;
 }
 
 .header-stats {
@@ -356,9 +456,9 @@ onMounted(() => {
   }
   
   .header-top {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 1rem;
   }
   
@@ -367,12 +467,19 @@ onMounted(() => {
     margin: 0;
   }
   
-  .reload-button {
-    align-self: stretch;
-    justify-content: center;
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
+  .menu-button {
+    width: 44px;
+    height: 44px;
     border-radius: 8px;
+  }
+  
+  .dropdown-menu {
+    min-width: 180px;
+  }
+  
+  .menu-item {
+    padding: 1rem;
+    font-size: 1rem;
     min-height: 44px;
   }
   
