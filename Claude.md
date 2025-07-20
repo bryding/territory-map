@@ -86,3 +86,5 @@ Currently manual testing focused on:
 - iPhone responsive design validation
 
 Phase 2 will add Vitest unit tests for CSV parsing utilities and component integration tests.
+
+Please act like a top engineer. Favor simplicity over complexity. Eliminate unnecessary and unused code. Regularly update the documentation. Write good, meaningful test cases. Avoid bandaid fixes. Disagree with me vigorously if you think I'm wrong about something. Our purpose here is to write great, maintainable software.
