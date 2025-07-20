@@ -1,7 +1,14 @@
 <template>
   <div class="territory-map-view">
     <header class="app-header">
-      <h1>Territory Call Map</h1>
+      <div class="header-top">
+        <h1>Territory Call Map</h1>
+        <button v-if="!loading && customers.length > 0" @click="reloadData" class="reload-button" :disabled="reloading">
+          <span v-if="reloading">🔄</span>
+          <span v-else>🔄</span>
+          {{ reloading ? 'Reloading...' : 'Reload Data' }}
+        </button>
+      </div>
       <div v-if="!loading && customers.length > 0" class="header-stats">
         <span>{{ customers.length }} customers</span>
         <span>${{ formatCurrency(totalSales) }}</span>
@@ -34,13 +41,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import type { Territory } from '@/types'
 import { useTerritoryStore } from '@/stores/territory'
 import TerritoryQuadrant from '@/components/TerritoryQuadrant.vue'
 import CSVLoader from '@/components/CSVLoader.vue'
+import { loadTestData } from '@/utils/testData'
 
 const territoryStore = useTerritoryStore()
+const reloading = ref(false)
 
 // Territory order for display
 const territories: Territory[] = [
@@ -77,6 +86,23 @@ async function retryLoad() {
   }
 }
 
+async function reloadData() {
+  reloading.value = true
+  try {
+    console.log('🔄 Reloading data...')
+    const success = await loadTestData(true) // Force reload with cache busting
+    if (success) {
+      console.log('✅ Data reloaded successfully!')
+    } else {
+      console.error('❌ Failed to reload data')
+    }
+  } catch (error) {
+    console.error('Failed to reload data:', error)
+  } finally {
+    reloading.value = false
+  }
+}
+
 onMounted(() => {
   // Try to load data from localStorage on app start
   if (customers.value.length === 0) {
@@ -100,11 +126,47 @@ onMounted(() => {
   z-index: 10;
 }
 
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
 .app-header h1 {
-  margin: 0 0 0.5rem 0;
+  margin: 0;
   font-size: 1.5rem;
   font-weight: 700;
   color: #111827;
+}
+
+.reload-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.reload-button:hover:not(:disabled) {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+}
+
+.reload-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.reload-button:disabled span {
+  animation: spin 1s linear infinite;
 }
 
 .header-stats {
@@ -179,9 +241,25 @@ onMounted(() => {
     padding: 1rem 1rem 1.5rem 1rem;
   }
   
+  .header-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
   .app-header h1 {
     font-size: 1.5rem;
-    margin-bottom: 0.75rem;
+    margin: 0;
+  }
+  
+  .reload-button {
+    align-self: stretch;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    min-height: 44px;
   }
   
   .header-stats {

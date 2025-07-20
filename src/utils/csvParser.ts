@@ -114,6 +114,7 @@ export class CSVParser {
     const normalized = header.trim().toLowerCase().replace(/[^a-z0-9]/g, '_')
     // Map specific CSV columns to expected names
     if (normalized === 'i') return 'accountName'
+    if (normalized === 'account_name__cn_' || normalized === 'account_name_cn') return 'accountName'
     if (normalized === 'address') return 'address'
     return normalized
   }
