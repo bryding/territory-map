@@ -1,18 +1,43 @@
-name: Deploy to GitHub Pages
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [master]
+    branches: ['*']  # Run on all branches
+  pull_request:
+    branches: [master, main]
 
 jobs:
-  build-and-deploy:
+  test:
+    name: Run Tests
     runs-on: ubuntu-latest
     
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run tests
+        run: yarn test:unit --run
+
+      - name: Type check
+        run: yarn type-check
+
+      - name: Lint check
+        run: yarn lint
+
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    needs: test  # Only build if tests pass
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,6 +53,30 @@ jobs:
 
       - name: Build application
         run: NODE_ENV=production yarn build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: ./dist
+
+  deploy:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: [test, build]  # Only deploy if tests and build pass
+    if: github.ref == 'refs/heads/master'  # Only deploy from master branch
+    
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: ./dist
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
