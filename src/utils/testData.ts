@@ -9,7 +9,7 @@ export async function loadTestData() {
   try {
     // Common CSV filenames to try
     const possibleFiles = [
-      'Denver South Territory File(SkinPen$).csv',
+      'sample-data.csv',
       'High Plains Sales Data.csv',
       'Denver South Territory File.csv',
       'sales-data.csv',
