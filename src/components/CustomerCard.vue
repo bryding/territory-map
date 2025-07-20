@@ -18,17 +18,17 @@
       </div>
       
       <div class="sales-data">
-        <div v-if="hasSales(customer.salesData.daxxify)" class="product-sales">
+        <div v-if="SalesUtils.getTotalSales(customer.salesData.daxxify) > 0" class="product-sales">
           <span class="product-name">DAXXIFY:</span>
-          <span class="sales-amount">${{ formatCurrency(getTotalSales(customer.salesData.daxxify)) }}</span>
+          <span class="sales-amount">${{ formatCurrency(SalesUtils.getTotalSales(customer.salesData.daxxify)) }}</span>
         </div>
-        <div v-if="hasSales(customer.salesData.rha)" class="product-sales">
+        <div v-if="SalesUtils.getTotalSales(customer.salesData.rha) > 0" class="product-sales">
           <span class="product-name">RHA:</span>
-          <span class="sales-amount">${{ formatCurrency(getTotalSales(customer.salesData.rha)) }}</span>
+          <span class="sales-amount">${{ formatCurrency(SalesUtils.getTotalSales(customer.salesData.rha)) }}</span>
         </div>
-        <div v-if="hasSales(customer.salesData.skinPen)" class="product-sales">
+        <div v-if="SalesUtils.getTotalSales(customer.salesData.skinPen) > 0" class="product-sales">
           <span class="product-name">SkinPen:</span>
-          <span class="sales-amount">${{ formatCurrency(getTotalSales(customer.salesData.skinPen)) }}</span>
+          <span class="sales-amount">${{ formatCurrency(SalesUtils.getTotalSales(customer.salesData.skinPen)) }}</span>
         </div>
       </div>
       
@@ -49,9 +49,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { Customer, QuarterlySales } from '@/types'
+import type { Customer } from '@/types'
 import { SalesUtils } from '@/utils/salesUtils'
 import { openInMaps } from '@/utils/maps'
+import { formatCurrency } from '@/utils/common'
 
 interface Props {
   customer: Customer
@@ -62,18 +63,6 @@ const props = defineProps<Props>()
 const hasNotes = computed(() => {
   return !!(props.customer.notes.general || props.customer.notes.contact || props.customer.notes.product)
 })
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US').format(amount)
-}
-
-function hasSales(sales: QuarterlySales): boolean {
-  return SalesUtils.getTotalSales(sales) > 0
-}
-
-function getTotalSales(sales: QuarterlySales): number {
-  return SalesUtils.getTotalSales(sales)
-}
 
 function openMaps() {
   openInMaps(props.customer.businessAddress)

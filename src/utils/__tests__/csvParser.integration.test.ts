@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest'
 import { CSVParser } from '../csvParser'
-import type { Customer } from '@/types'
 
 describe('CSV Parser Integration Tests', () => {
   describe('Real-world CSV parsing scenarios', () => {

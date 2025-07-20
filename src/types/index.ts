@@ -58,25 +58,11 @@ export interface CSVRow {
   [key: string]: string | undefined
 }
 
-export interface ParsedCustomerData {
-  customerNumber: string
-  accountName: string
-  salesRep: string
-  notes: CustomerNotes
-  salesByBrand: Record<ProductBrand, QuarterlySales>
-}
-
 export interface TerritoryStats {
   customerCount: number
   totalSales: number
   q3PromoTargets: number
   topProduct: ProductBrand
-}
-
-export interface AppError {
-  code: string
-  message: string
-  details?: any
 }
 
 export interface SearchFilters {
@@ -88,21 +74,5 @@ export interface SearchFilters {
   maxSales?: number
 }
 
-export interface SearchState {
-  query: string
-  filters: SearchFilters
-  isSearching: boolean
-  results: Customer[]
-}
-
 // Utility types for working with quarterly sales
 export type PeriodKey = `${number}-Q${1 | 2 | 3 | 4}`
-
-export interface SalesUtils {
-  createPeriodKey: (year: number, quarter: number) => PeriodKey
-  parsePeriodKey: (key: string) => { year: number; quarter: number } | null
-  getSalesForYear: (sales: QuarterlySales, year: number) => number
-  getSalesForQuarter: (sales: QuarterlySales, year: number, quarter: number) => number
-  getTotalSales: (sales: QuarterlySales) => number
-  getLatestSales: (sales: QuarterlySales) => { period: string; amount: number } | null
-}

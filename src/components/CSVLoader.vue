@@ -77,7 +77,7 @@ async function processFile(file: File) {
   try {
     const text = await file.text()
     await territoryStore.loadFromCSV(text)
-  } catch (err) {
+  } catch (err: unknown) {
     error.value = err instanceof Error ? err.message : 'Failed to load CSV file'
   } finally {
     loading.value = false
@@ -93,7 +93,7 @@ async function loadSampleData() {
     if (!success) {
       error.value = 'Failed to load sample data'
     }
-  } catch (err) {
+  } catch {
     error.value = 'Failed to load sample data'
   } finally {
     loading.value = false

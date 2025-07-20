@@ -7,7 +7,6 @@ export const useSearchStore = defineStore('search', () => {
   // State
   const query = ref('')
   const filters = ref<SearchFilters>({})
-  const isSearching = ref(false)
 
   // Dependencies
   const territoryStore = useTerritoryStore()
@@ -84,7 +83,6 @@ export const useSearchStore = defineStore('search', () => {
     // State
     query,
     filters,
-    isSearching,
     
     // Computed
     results,

@@ -3,7 +3,7 @@ import { useTerritoryStore } from '@/stores/territory'
 /**
  * Load test data from any CSV file in the data directory
  */
-export async function loadTestData(forceReload = false) {
+export async function loadTestData() {
   const territoryStore = useTerritoryStore()
   
   try {
@@ -51,7 +51,7 @@ export async function loadTestData(forceReload = false) {
           console.log('📋 First 3 lines of CSV:', lines)
           break
         }
-      } catch (error) {
+      } catch {
         console.log(`⚠️ Failed to load ${filename}, trying next...`)
         continue
       }
@@ -77,5 +77,5 @@ export async function loadTestData(forceReload = false) {
 
 // Make this available globally for testing in browser console
 if (typeof window !== 'undefined') {
-  (window as any).loadTestData = loadTestData
+  (window as unknown as Record<string, unknown>).loadTestData = loadTestData
 }

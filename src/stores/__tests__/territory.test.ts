@@ -196,7 +196,7 @@ describe('Territory Store', () => {
   describe('localStorage Integration', () => {
     it('should save to localStorage after successful CSV load', async () => {
       const { CSVParser } = await import('@/utils/csvParser')
-      const mockParseCSV = CSVParser.parseCSV as any
+      const mockParseCSV = vi.mocked(CSVParser.parseCSV)
       
       mockParseCSV.mockResolvedValue({
         data: mockCustomers,
@@ -247,7 +247,7 @@ describe('Territory Store', () => {
   describe('CSV Loading Error Handling', () => {
     it('should handle CSV parsing errors', async () => {
       const { CSVParser } = await import('@/utils/csvParser')
-      const mockParseCSV = CSVParser.parseCSV as any
+      const mockParseCSV = vi.mocked(CSVParser.parseCSV)
       
       mockParseCSV.mockResolvedValue({
         data: [],
@@ -267,7 +267,7 @@ describe('Territory Store', () => {
 
     it('should handle CSV parser throwing errors', async () => {
       const { CSVParser } = await import('@/utils/csvParser')
-      const mockParseCSV = CSVParser.parseCSV as any
+      const mockParseCSV = vi.mocked(CSVParser.parseCSV)
       
       mockParseCSV.mockRejectedValue(new Error('Invalid CSV format'))
       
@@ -279,7 +279,7 @@ describe('Territory Store', () => {
 
     it('should set loading state correctly during CSV operations', async () => {
       const { CSVParser } = await import('@/utils/csvParser')
-      const mockParseCSV = CSVParser.parseCSV as any
+      const mockParseCSV = vi.mocked(CSVParser.parseCSV)
       
       // Mock slow parsing
       mockParseCSV.mockImplementation(() => 

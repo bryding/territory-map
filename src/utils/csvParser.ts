@@ -1,6 +1,7 @@
 import Papa from 'papaparse'
 import type { CSVRow, Customer, ProductBrand, QuarterlySales, CustomerNotes, Territory } from '@/types'
 import { CSVQuarterDetector, SalesUtils } from './salesUtils'
+import { KNOWN_SALES_REPS, TERRITORIES } from './common'
 
 export interface ParseResult<T> {
   data: T[]
@@ -24,17 +25,6 @@ export interface ParseMeta {
 
 export class CSVParser {
   private static readonly REQUIRED_COLUMNS = ['PAC', 'Brand'] as const
-  private static readonly KNOWN_SALES_REPS = [
-    'Bobbie Koon',
-    'Brooklynne Woolslayer', 
-    'Heather McGlory',
-    'Kaiti Green',
-    'Kaleigh Humphrey',
-    'Kim Coates',
-    'Kimberly McMurray',
-    'Victoria Greene',
-    'Wendy Shepherd'
-  ] as const
 
   /**
    * Parses CSV text into customer data
@@ -96,7 +86,7 @@ export class CSVParser {
             meta
           })
         },
-        error: (error: any) => {
+        error: (error: Error) => {
           resolve({
             data: [],
             errors: [{ row: 0, message: error.message, code: 'PARSE_ERROR' }],
@@ -189,7 +179,7 @@ export class CSVParser {
    * Validates if sales rep name is recognized
    */
   private static isValidSalesRep(salesRep: string): boolean {
-    return this.KNOWN_SALES_REPS.includes(salesRep as any)
+    return (KNOWN_SALES_REPS as readonly string[]).includes(salesRep)
   }
 
   /**
@@ -260,7 +250,7 @@ export class CSVParser {
         rha: salesByBrand.get('RHA') || { salesByPeriod: {} },
         skinPen: salesByBrand.get('SkinPen') || { salesByPeriod: {} }
       },
-      isQ3PromoTarget: this.determineQ3PromoTarget(rows),
+      isQ3PromoTarget: this.determineQ3PromoTarget(),
       totalSales
     }
   }
@@ -336,12 +326,12 @@ export class CSVParser {
   }
 
   /**
-   * Placeholder: Extract business address from account name
-   * TODO: Implement proper address extraction/geocoding
+   * Extract business address from account name
+   * Returns a fallback address if no address data is available
    */
   private static extractBusinessAddress(accountName: string): string {
-    // For now, return a placeholder - in real implementation this would
-    // need address data from another source or geocoding service
+    // Return a fallback address when no address data is available
+    // In a future version, this could integrate with geocoding services
     return `${accountName}, Colorado`
   }
 
@@ -351,16 +341,8 @@ export class CSVParser {
   private static inferTerritory(accountName: string, address?: string): Territory {
     if (!address) {
       // Fallback to hash-based distribution if no address
-      const territories: Territory[] = [
-        'colorado-springs-north',
-        'colorado-springs-central', 
-        'colorado-springs-south',
-        'highlands-ranch',
-        'littleton',
-        'castle-rock'
-      ]
       const hash = accountName.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0)
-      return territories[hash % territories.length]
+      return TERRITORIES[hash % TERRITORIES.length]
     }
 
     const addressLower = address.toLowerCase()
@@ -390,11 +372,12 @@ export class CSVParser {
   }
 
   /**
-   * Placeholder: Determine if customer is Q3 promo target
-   * TODO: Implement Q3 promo target logic based on business rules
+   * Determine if customer is Q3 promo target
+   * Currently returns false - business rules to be defined
    */
-  private static determineQ3PromoTarget(rows: Array<CSVRow & { rowIndex: number }>): boolean {
-    // Placeholder - implement based on business rules
+  private static determineQ3PromoTarget(): boolean {
+    // Business logic for Q3 promo targeting will be implemented
+    // when specific criteria are defined by the business team
     return false
   }
 }

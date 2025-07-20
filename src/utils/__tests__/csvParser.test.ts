@@ -10,12 +10,6 @@ Kaiti Green,Ageless Skin Co. (CN180974),5432 W Littleton Blvd Littleton CO 80120
   it('should parse CSV with correct column mapping', async () => {
     const result = await CSVParser.parseCSV(sampleCSV)
     
-    console.log('Test result:', {
-      data: result.data,
-      errors: result.errors,
-      meta: result.meta
-    })
-    
     expect(result.data.length).toBeGreaterThan(0)
     expect(result.errors.length).toBe(0)
   })

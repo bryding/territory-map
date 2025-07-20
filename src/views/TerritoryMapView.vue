@@ -80,21 +80,14 @@ import { useTerritoryStore } from '@/stores/territory'
 import CustomerCard from '@/components/CustomerCard.vue'
 import CSVLoader from '@/components/CSVLoader.vue'
 import { loadTestData } from '@/utils/testData'
+import { formatCurrency, formatTerritoryName, TERRITORIES } from '@/utils/common'
 
 const territoryStore = useTerritoryStore()
 const reloading = ref(false)
 const selectedTerritory = ref<Territory | ''>('')
 const menuOpen = ref(false)
 
-// Territory order for display
-const territories: Territory[] = [
-  'colorado-springs-north',
-  'colorado-springs-central', 
-  'colorado-springs-south',
-  'highlands-ranch',
-  'littleton',
-  'castle-rock'
-]
+// Use territories from shared constants
 
 const customers = computed(() => territoryStore.customers)
 const loading = computed(() => territoryStore.loading)
@@ -102,7 +95,7 @@ const error = computed(() => territoryStore.error)
 
 // Get territories that actually have customers
 const availableTerritories = computed(() => {
-  return territories.filter(territory => 
+  return TERRITORIES.filter(territory => 
     territoryStore.getCustomersByTerritory(territory).length > 0
   )
 })
@@ -124,21 +117,7 @@ function getCustomersByTerritory(territory: Territory) {
   return territoryStore.getCustomersByTerritory(territory)
 }
 
-function formatTerritoryName(territory: Territory): string {
-  const names: Record<Territory, string> = {
-    'colorado-springs-north': 'Colorado Springs North',
-    'colorado-springs-central': 'Colorado Springs Central',
-    'colorado-springs-south': 'Colorado Springs South',
-    'highlands-ranch': 'Highlands Ranch',
-    'littleton': 'Littleton',
-    'castle-rock': 'Castle Rock'
-  }
-  return names[territory]
-}
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US').format(amount)
-}
+// formatTerritoryName and formatCurrency are imported from @/utils/common
 
 async function retryLoad() {
   // Try to load from storage first
@@ -167,7 +146,7 @@ async function reloadData() {
   reloading.value = true
   try {
     console.log('🔄 Reloading data...')
-    const success = await loadTestData(true) // Force reload with cache busting
+    const success = await loadTestData() // Force reload with cache busting
     if (success) {
       console.log('✅ Data reloaded successfully!')
     } else {
