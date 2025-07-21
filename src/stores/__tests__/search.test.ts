@@ -328,11 +328,11 @@ describe('Search Store', () => {
       searchStore.setFilter('territory', 'colorado-springs-north')
       expect(searchStore.filters.territory).toBe('colorado-springs-north')
 
-      searchStore.setFilter('territory', null)
+      searchStore.setFilter('territory', null as unknown as undefined)
       expect(searchStore.filters.territory).toBeUndefined()
 
       searchStore.setFilter('territory', 'colorado-springs-north')
-      searchStore.setFilter('territory', '')
+      searchStore.setFilter('territory', '' as unknown as undefined)
       expect(searchStore.filters.territory).toBeUndefined()
 
       searchStore.setFilter('territory', 'colorado-springs-north')
