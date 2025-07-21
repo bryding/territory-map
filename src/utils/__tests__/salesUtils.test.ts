@@ -9,8 +9,8 @@ describe('SalesUtils', () => {
       '2024-Q2': 1500,
       '2024-Q3': 2000,
       '2024-Q4': 1800,
-      '2025-Q1': 2200
-    }
+      '2025-Q1': 2200,
+    },
   }
 
   describe('createPeriodKey', () => {
@@ -93,13 +93,16 @@ describe('SalesUtils', () => {
       // From 1000 to 1500 = 50% growth
       expect(SalesUtils.calculateGrowthRate(mockSalesData, '2024-Q1', '2024-Q2')).toBe(50)
       // From 1500 to 2000 = 33.33% growth
-      expect(SalesUtils.calculateGrowthRate(mockSalesData, '2024-Q2', '2024-Q3')).toBeCloseTo(33.33, 2)
+      expect(SalesUtils.calculateGrowthRate(mockSalesData, '2024-Q2', '2024-Q3')).toBeCloseTo(
+        33.33,
+        2,
+      )
     })
 
     it('should return null for invalid periods or zero base', () => {
       expect(SalesUtils.calculateGrowthRate(mockSalesData, '2023-Q1', '2024-Q1')).toBeNull()
       expect(SalesUtils.calculateGrowthRate(mockSalesData, '2024-Q1', '2023-Q1')).toBeNull()
-      
+
       const zeroBaseSales: QuarterlySales = { salesByPeriod: { '2024-Q1': 0, '2024-Q2': 100 } }
       expect(SalesUtils.calculateGrowthRate(zeroBaseSales, '2024-Q1', '2024-Q2')).toBeNull()
     })
@@ -113,12 +116,12 @@ describe('CSVQuarterDetector', () => {
       expect(CSVQuarterDetector.isQuarterColumn('1Q24')).toBe(true)
       expect(CSVQuarterDetector.isQuarterColumn('2Q24')).toBe(true)
       expect(CSVQuarterDetector.isQuarterColumn('3q25')).toBe(true)
-      
+
       // Q-year format
       expect(CSVQuarterDetector.isQuarterColumn('Q1 2024')).toBe(true)
       expect(CSVQuarterDetector.isQuarterColumn('Q2 2025')).toBe(true)
       expect(CSVQuarterDetector.isQuarterColumn('q3 2024')).toBe(true)
-      
+
       // Year-Q format
       expect(CSVQuarterDetector.isQuarterColumn('2024-Q1')).toBe(true)
       expect(CSVQuarterDetector.isQuarterColumn('2025-q2')).toBe(true)
@@ -174,12 +177,12 @@ describe('CSVQuarterDetector', () => {
     it('should extract quarter columns from headers', () => {
       const headers = ['PAC', 'Account Name', '1Q24', '2Q24', '3Q24', 'Brand', 'Q1 2025']
       const result = CSVQuarterDetector.getQuarterColumns(headers)
-      
+
       expect(result).toEqual([
         { original: '1Q24', standardized: '2024-Q1' },
         { original: '2Q24', standardized: '2024-Q2' },
         { original: '3Q24', standardized: '2024-Q3' },
-        { original: 'Q1 2025', standardized: '2025-Q1' }
+        { original: 'Q1 2025', standardized: '2025-Q1' },
       ])
     })
 

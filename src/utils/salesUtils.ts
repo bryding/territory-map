@@ -17,10 +17,10 @@ export class SalesUtils {
   static parsePeriodKey(key: string): { year: number; quarter: number } | null {
     const match = key.match(/^(\d{4})-Q([1-4])$/)
     if (!match) return null
-    
+
     return {
       year: parseInt(match[1], 10),
-      quarter: parseInt(match[2], 10)
+      quarter: parseInt(match[2], 10),
     }
   }
 
@@ -58,7 +58,7 @@ export class SalesUtils {
     // Sort by period descending to get latest
     const sortedEntries = entries.sort(([a], [b]) => b.localeCompare(a))
     const [period, amount] = sortedEntries[0]
-    
+
     return { period, amount }
   }
 
@@ -72,14 +72,18 @@ export class SalesUtils {
   /**
    * Calculates growth rate between two periods
    */
-  static calculateGrowthRate(sales: QuarterlySales, fromPeriod: string, toPeriod: string): number | null {
+  static calculateGrowthRate(
+    sales: QuarterlySales,
+    fromPeriod: string,
+    toPeriod: string,
+  ): number | null {
     const fromAmount = sales.salesByPeriod[fromPeriod]
     const toAmount = sales.salesByPeriod[toPeriod]
-    
+
     if (fromAmount === undefined || toAmount === undefined || fromAmount === 0) {
       return null
     }
-    
+
     return ((toAmount - fromAmount) / fromAmount) * 100
   }
 }
@@ -90,10 +94,10 @@ export class SalesUtils {
 export class CSVQuarterDetector {
   // Patterns for detecting quarter columns in various formats
   private static readonly QUARTER_PATTERNS = [
-    /^(\d{1})[Qq](\d{2})$/,        // "2Q24", "3Q24", "2q24", "3q24" (current format)
-    /^[Qq](\d{1})\s*(\d{4})$/,     // "Q2 2024", "Q3 2024", "q2 2024"
-    /^(\d{4})-[Qq](\d{1})$/,       // "2024-Q2", "2024-Q3", "2024-q2"
-    /^(\d{4})[Qq](\d{1})$/,        // "2024Q2", "2024Q3", "2024q2"
+    /^(\d{1})[Qq](\d{2})$/, // "2Q24", "3Q24", "2q24", "3q24" (current format)
+    /^[Qq](\d{1})\s*(\d{4})$/, // "Q2 2024", "Q3 2024", "q2 2024"
+    /^(\d{4})-[Qq](\d{1})$/, // "2024-Q2", "2024-Q3", "2024-q2"
+    /^(\d{4})[Qq](\d{1})$/, // "2024Q2", "2024Q3", "2024q2"
   ]
 
   /**
@@ -108,17 +112,17 @@ export class CSVQuarterDetector {
    */
   static parseQuarterColumn(columnName: string): PeriodKey | null {
     const trimmed = columnName.trim()
-    
+
     // Try each pattern
     for (let i = 0; i < this.QUARTER_PATTERNS.length; i++) {
       const pattern = this.QUARTER_PATTERNS[i]
       const match = trimmed.match(pattern)
       if (match) {
         const [, first, second] = match
-        
+
         // Determine year and quarter based on pattern index
         let year: number, quarter: number
-        
+
         if (i === 0) {
           // Pattern 0: /^(\d{1})[Qq](\d{2})$/ - "2q24" format
           quarter = parseInt(first, 10)
@@ -132,27 +136,29 @@ export class CSVQuarterDetector {
           year = parseInt(first, 10)
           quarter = parseInt(second, 10)
         }
-        
+
         if (quarter >= 1 && quarter <= 4 && year >= 2020 && year <= 2030) {
           return SalesUtils.createPeriodKey(year, quarter)
         }
       }
     }
-    
+
     return null
   }
 
   /**
    * Gets all quarter columns from CSV headers
    */
-  static getQuarterColumns(headers: string[]): Array<{ original: string; standardized: PeriodKey }> {
+  static getQuarterColumns(
+    headers: string[],
+  ): Array<{ original: string; standardized: PeriodKey }> {
     return headers
-      .map(header => ({
+      .map((header) => ({
         original: header,
-        standardized: this.parseQuarterColumn(header)
+        standardized: this.parseQuarterColumn(header),
       }))
-      .filter((item): item is { original: string; standardized: PeriodKey } => 
-        item.standardized !== null
+      .filter(
+        (item): item is { original: string; standardized: PeriodKey } => item.standardized !== null,
       )
   }
 }

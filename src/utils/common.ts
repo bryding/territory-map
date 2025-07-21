@@ -19,8 +19,8 @@ export const TERRITORY_NAMES: Record<Territory, string> = {
   'colorado-springs-central': 'Colorado Springs Central',
   'colorado-springs-south': 'Colorado Springs South',
   'highlands-ranch': 'Highlands Ranch',
-  'littleton': 'Littleton',
-  'castle-rock': 'Castle Rock'
+  littleton: 'Littleton',
+  'castle-rock': 'Castle Rock',
 } as const
 
 /**
@@ -28,11 +28,11 @@ export const TERRITORY_NAMES: Record<Territory, string> = {
  */
 export const TERRITORIES: readonly Territory[] = [
   'colorado-springs-north',
-  'colorado-springs-central', 
+  'colorado-springs-central',
   'colorado-springs-south',
   'highlands-ranch',
   'littleton',
-  'castle-rock'
+  'castle-rock',
 ] as const
 
 /**
@@ -47,12 +47,12 @@ export function formatTerritoryName(territory: Territory): string {
  */
 export const KNOWN_SALES_REPS = [
   'Bobbie Koon',
-  'Brooklynne Woolslayer', 
+  'Brooklynne Woolslayer',
   'Heather McGlory',
   'Kaiti Green',
   'Kaleigh Humphrey',
   'Kim Coates',
   'Kimberly McMurray',
   'Victoria Greene',
-  'Wendy Shepherd'
+  'Wendy Shepherd',
 ] as const

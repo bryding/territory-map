@@ -19,25 +19,17 @@
           </div>
         </div>
       </div>
-      
+
       <div v-if="!loading && customers.length > 0" class="territory-filter">
         <label for="territory-select" class="filter-label">Territory:</label>
-        <select 
-          id="territory-select" 
-          v-model="selectedTerritory" 
-          class="territory-select"
-        >
+        <select id="territory-select" v-model="selectedTerritory" class="territory-select">
           <option value="">All Territories</option>
-          <option 
-            v-for="territory in availableTerritories" 
-            :key="territory" 
-            :value="territory"
-          >
+          <option v-for="territory in availableTerritories" :key="territory" :value="territory">
             {{ formatTerritoryName(territory) }} ({{ getCustomersByTerritory(territory).length }})
           </option>
         </select>
       </div>
-      
+
       <div v-if="!loading && customers.length > 0" class="header-stats">
         <span>{{ filteredCustomers.length }} customers</span>
         <span>${{ formatCurrency(filteredTotalSales) }}</span>
@@ -60,7 +52,11 @@
 
     <div v-else class="customer-list">
       <div v-if="filteredCustomers.length === 0" class="no-customers">
-        <p>No customers found{{ selectedTerritory ? ` in ${formatTerritoryName(selectedTerritory)}` : '' }}</p>
+        <p>
+          No customers found{{
+            selectedTerritory ? ` in ${formatTerritoryName(selectedTerritory)}` : ''
+          }}
+        </p>
       </div>
       <div v-else class="customers-grid">
         <CustomerCard
@@ -95,8 +91,8 @@ const error = computed(() => territoryStore.error)
 
 // Get territories that actually have customers
 const availableTerritories = computed(() => {
-  return TERRITORIES.filter(territory => 
-    territoryStore.getCustomersByTerritory(territory).length > 0
+  return TERRITORIES.filter(
+    (territory) => territoryStore.getCustomersByTerritory(territory).length > 0,
   )
 })
 
@@ -164,7 +160,7 @@ onMounted(() => {
   if (customers.value.length === 0) {
     territoryStore.loadFromStorage()
   }
-  
+
   // Add click outside handler
   document.addEventListener('click', handleClickOutside)
 })
@@ -307,7 +303,9 @@ onUnmounted(() => {
   color: #6b7280;
 }
 
-.loading, .error, .empty-state {
+.loading,
+.error,
+.empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -328,8 +326,12 @@ onUnmounted(() => {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .error {
@@ -411,69 +413,72 @@ onUnmounted(() => {
     padding: 0;
     gap: 1rem;
   }
-  
+
   .territory-filter {
     flex-direction: column;
     align-items: stretch;
     gap: 0.5rem;
     padding: 1rem;
   }
-  
+
   .filter-label {
     font-size: 1rem;
   }
-  
+
   .territory-select {
     min-width: auto;
     padding: 0.75rem;
     font-size: 1rem;
     border-radius: 8px;
   }
-  
+
   .app-header {
     padding: 1rem 1rem 1.5rem 1rem;
   }
-  
+
   .header-top {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
   }
-  
+
   .app-header h1 {
     font-size: 1.5rem;
     margin: 0;
   }
-  
+
   .menu-button {
     width: 44px;
     height: 44px;
     border-radius: 8px;
   }
-  
+
   .dropdown-menu {
     min-width: 180px;
   }
-  
+
   .menu-item {
     padding: 1rem;
     font-size: 1rem;
     min-height: 44px;
   }
-  
+
   .header-stats {
     flex-direction: row;
     gap: 1rem;
     font-size: 1rem;
   }
 
-  .loading, .error, .empty-state {
+  .loading,
+  .error,
+  .empty-state {
     padding: 1rem;
     min-height: 60vh;
   }
 
-  .loading p, .error p {
+  .loading p,
+  .error p {
     font-size: 1.1rem;
     line-height: 1.4;
   }

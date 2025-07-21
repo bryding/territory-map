@@ -12,24 +12,30 @@ export const useTerritoryStore = defineStore('territory', () => {
 
   // Computed - Territory groups
   const customersByTerritory = computed(() => {
-    return customers.value.reduce((acc, customer) => {
-      if (!acc[customer.territory]) {
-        acc[customer.territory] = []
-      }
-      acc[customer.territory].push(customer)
-      return acc
-    }, {} as Record<Territory, Customer[]>)
+    return customers.value.reduce(
+      (acc, customer) => {
+        if (!acc[customer.territory]) {
+          acc[customer.territory] = []
+        }
+        acc[customer.territory].push(customer)
+        return acc
+      },
+      {} as Record<Territory, Customer[]>,
+    )
   })
 
   // Computed - Sales rep groups
   const customersBySalesRep = computed(() => {
-    return customers.value.reduce((acc, customer) => {
-      if (!acc[customer.salesRep]) {
-        acc[customer.salesRep] = []
-      }
-      acc[customer.salesRep].push(customer)
-      return acc
-    }, {} as Record<string, Customer[]>)
+    return customers.value.reduce(
+      (acc, customer) => {
+        if (!acc[customer.salesRep]) {
+          acc[customer.salesRep] = []
+        }
+        acc[customer.salesRep].push(customer)
+        return acc
+      },
+      {} as Record<string, Customer[]>,
+    )
   })
 
   // Computed - Sales representatives
@@ -38,7 +44,7 @@ export const useTerritoryStore = defineStore('territory', () => {
       name,
       customers: repCustomers,
       totalSales: repCustomers.reduce((sum, customer) => sum + customer.totalSales, 0),
-      territories: [...new Set(repCustomers.map(c => c.territory))]
+      territories: [...new Set(repCustomers.map((c) => c.territory))],
     }))
   })
 
@@ -48,24 +54,26 @@ export const useTerritoryStore = defineStore('territory', () => {
 
     Object.entries(customersByTerritory.value).forEach(([territory, territoryCustomers]) => {
       const totalSales = territoryCustomers.reduce((sum, customer) => sum + customer.totalSales, 0)
-      const q3PromoTargets = territoryCustomers.filter(c => c.isQ3PromoTarget).length
-      
+      const q3PromoTargets = territoryCustomers.filter((c) => c.isQ3PromoTarget).length
+
       // Find top product by total sales
       const productSales = { DAXXIFY: 0, RHA: 0, SkinPen: 0 }
-      territoryCustomers.forEach(customer => {
+      territoryCustomers.forEach((customer) => {
         productSales.DAXXIFY += SalesUtils.getTotalSales(customer.salesData.daxxify)
         productSales.RHA += SalesUtils.getTotalSales(customer.salesData.rha)
         productSales.SkinPen += SalesUtils.getTotalSales(customer.salesData.skinPen)
       })
-      
-      const topProduct = Object.entries(productSales)
-        .sort(([,a], [,b]) => b - a)[0][0] as 'DAXXIFY' | 'RHA' | 'SkinPen'
+
+      const topProduct = Object.entries(productSales).sort(([, a], [, b]) => b - a)[0][0] as
+        | 'DAXXIFY'
+        | 'RHA'
+        | 'SkinPen'
 
       stats[territory as Territory] = {
         customerCount: territoryCustomers.length,
         totalSales,
         q3PromoTargets,
-        topProduct
+        topProduct,
       }
     })
 
@@ -76,24 +84,25 @@ export const useTerritoryStore = defineStore('territory', () => {
   async function loadFromCSV(csvText: string) {
     loading.value = true
     error.value = null
-    
+
     try {
       const result = await CSVParser.parseCSV(csvText)
-      
+
       if (result.errors.length > 0) {
         console.warn('CSV parsing warnings:', result.errors)
       }
-      
+
       if (result.data.length === 0) {
-        throw new Error(`No customers parsed from CSV. Errors: ${result.errors.map(e => e.message).join(', ')}`)
+        throw new Error(
+          `No customers parsed from CSV. Errors: ${result.errors.map((e) => e.message).join(', ')}`,
+        )
       }
-      
+
       customers.value = result.data
-      
+
       // Store in localStorage for offline access
       localStorage.setItem('territory-customers', JSON.stringify(result.data))
       localStorage.setItem('territory-last-updated', new Date().toISOString())
-      
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to parse CSV'
       throw err
@@ -122,7 +131,7 @@ export const useTerritoryStore = defineStore('territory', () => {
   }
 
   function getCustomer(customerNumber: string): Customer | undefined {
-    return customers.value.find(c => c.customerNumber === customerNumber)
+    return customers.value.find((c) => c.customerNumber === customerNumber)
   }
 
   function getCustomersByTerritory(territory: Territory): Customer[] {
@@ -134,18 +143,18 @@ export const useTerritoryStore = defineStore('territory', () => {
     customers,
     loading,
     error,
-    
+
     // Computed
     customersByTerritory,
     customersBySalesRep,
     salesRepresentatives,
     territoryStats,
-    
+
     // Actions
     loadFromCSV,
     loadFromStorage,
     clearData,
     getCustomer,
-    getCustomersByTerritory
+    getCustomersByTerritory,
   }
 })

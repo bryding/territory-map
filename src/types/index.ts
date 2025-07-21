@@ -1,6 +1,6 @@
-export type Territory = 
+export type Territory =
   | 'colorado-springs-north'
-  | 'colorado-springs-south' 
+  | 'colorado-springs-south'
   | 'colorado-springs-central'
   | 'highlands-ranch'
   | 'littleton'
