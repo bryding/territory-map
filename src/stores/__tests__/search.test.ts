@@ -21,10 +21,10 @@ describe('Search Store', () => {
       salesData: {
         daxxify: { salesByPeriod: {} },
         rha: { salesByPeriod: {} },
-        skinPen: { salesByPeriod: { '2024-Q2': 1632, '2024-Q4': 1728 } }
+        skinPen: { salesByPeriod: { '2024-Q2': 1632, '2024-Q4': 1728 } },
       },
       isQ3PromoTarget: false,
-      totalSales: 3360
+      totalSales: 3360,
     },
     {
       id: 'cn047878',
@@ -37,10 +37,10 @@ describe('Search Store', () => {
       salesData: {
         daxxify: { salesByPeriod: { '2024-Q1': 5000 } },
         rha: { salesByPeriod: {} },
-        skinPen: { salesByPeriod: { '2024-Q2': 2500 } }
+        skinPen: { salesByPeriod: { '2024-Q2': 2500 } },
       },
       isQ3PromoTarget: true,
-      totalSales: 7500
+      totalSales: 7500,
     },
     {
       id: 'cn180974',
@@ -53,21 +53,21 @@ describe('Search Store', () => {
       salesData: {
         daxxify: { salesByPeriod: {} },
         rha: { salesByPeriod: {} },
-        skinPen: { salesByPeriod: { '2024-Q3': 450, '2024-Q4': 600 } }
+        skinPen: { salesByPeriod: { '2024-Q3': 450, '2024-Q4': 600 } },
       },
       isQ3PromoTarget: false,
-      totalSales: 1050
-    }
+      totalSales: 1050,
+    },
   ]
 
   describe('Text Search', () => {
     it('should filter by account name', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
       searchStore.setQuery('4EYMED')
-      
+
       expect(searchStore.results).toHaveLength(1)
       expect(searchStore.results[0].accountName).toBe('4EYMED LLC')
     })
@@ -75,10 +75,10 @@ describe('Search Store', () => {
     it('should filter by customer number', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
       searchStore.setQuery('CN047878')
-      
+
       expect(searchStore.results).toHaveLength(1)
       expect(searchStore.results[0].customerNumber).toBe('CN047878')
     })
@@ -86,21 +86,21 @@ describe('Search Store', () => {
     it('should filter by sales rep name', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
       searchStore.setQuery('Kaiti Green')
-      
+
       expect(searchStore.results).toHaveLength(2)
-      expect(searchStore.results.every(c => c.salesRep === 'Kaiti Green')).toBe(true)
+      expect(searchStore.results.every((c) => c.salesRep === 'Kaiti Green')).toBe(true)
     })
 
     it('should filter by business address', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
       searchStore.setQuery('Highlands Ranch')
-      
+
       expect(searchStore.results).toHaveLength(1)
       expect(searchStore.results[0].businessAddress).toContain('Highlands Ranch')
     })
@@ -108,10 +108,10 @@ describe('Search Store', () => {
     it('should be case insensitive', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
       searchStore.setQuery('advanced')
-      
+
       expect(searchStore.results).toHaveLength(1)
       expect(searchStore.results[0].accountName).toBe('Advanced Dermatology')
     })
@@ -119,10 +119,10 @@ describe('Search Store', () => {
     it('should handle partial matches', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
       searchStore.setQuery('Dermatology')
-      
+
       expect(searchStore.results).toHaveLength(1)
       expect(searchStore.results[0].accountName).toBe('Advanced Dermatology')
     })
@@ -130,10 +130,10 @@ describe('Search Store', () => {
     it('should trim whitespace from query', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
       searchStore.setQuery('  4EYMED  ')
-      
+
       expect(searchStore.results).toHaveLength(1)
       expect(searchStore.results[0].accountName).toBe('4EYMED LLC')
     })
@@ -141,10 +141,10 @@ describe('Search Store', () => {
     it('should return empty results for no matches', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
       searchStore.setQuery('NonExistentCustomer')
-      
+
       expect(searchStore.results).toHaveLength(0)
     })
   })
@@ -153,10 +153,10 @@ describe('Search Store', () => {
     it('should filter by territory', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
       searchStore.setFilter('territory', 'colorado-springs-north')
-      
+
       expect(searchStore.results).toHaveLength(1)
       expect(searchStore.results[0].territory).toBe('colorado-springs-north')
     })
@@ -164,11 +164,11 @@ describe('Search Store', () => {
     it('should return all customers when territory filter is cleared', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
       searchStore.setFilter('territory', 'colorado-springs-north')
       searchStore.setFilter('territory', undefined)
-      
+
       expect(searchStore.results).toHaveLength(3)
     })
   })
@@ -177,10 +177,10 @@ describe('Search Store', () => {
     it('should filter by sales rep', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
       searchStore.setFilter('salesRep', 'John Smith')
-      
+
       expect(searchStore.results).toHaveLength(1)
       expect(searchStore.results[0].salesRep).toBe('John Smith')
     })
@@ -190,10 +190,10 @@ describe('Search Store', () => {
     it('should filter Q3 promo targets', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
       searchStore.setFilter('isQ3PromoTarget', true)
-      
+
       expect(searchStore.results).toHaveLength(1)
       expect(searchStore.results[0].isQ3PromoTarget).toBe(true)
     })
@@ -201,12 +201,12 @@ describe('Search Store', () => {
     it('should filter non-Q3 promo targets', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
       searchStore.setFilter('isQ3PromoTarget', false)
-      
+
       expect(searchStore.results).toHaveLength(2)
-      expect(searchStore.results.every(c => !c.isQ3PromoTarget)).toBe(true)
+      expect(searchStore.results.every((c) => !c.isQ3PromoTarget)).toBe(true)
     })
   })
 
@@ -214,21 +214,21 @@ describe('Search Store', () => {
     it('should filter by minimum sales', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
       searchStore.setFilter('minSales', 3000)
-      
+
       expect(searchStore.results).toHaveLength(2)
-      expect(searchStore.results.every(c => c.totalSales >= 3000)).toBe(true)
+      expect(searchStore.results.every((c) => c.totalSales >= 3000)).toBe(true)
     })
 
     it('should filter by maximum sales', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
       searchStore.setFilter('maxSales', 2000)
-      
+
       expect(searchStore.results).toHaveLength(1)
       expect(searchStore.results[0].totalSales).toBe(1050)
     })
@@ -236,13 +236,15 @@ describe('Search Store', () => {
     it('should filter by sales range', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
       searchStore.setFilter('minSales', 1000)
       searchStore.setFilter('maxSales', 5000)
-      
+
       expect(searchStore.results).toHaveLength(2)
-      expect(searchStore.results.every(c => c.totalSales >= 1000 && c.totalSales <= 5000)).toBe(true)
+      expect(searchStore.results.every((c) => c.totalSales >= 1000 && c.totalSales <= 5000)).toBe(
+        true,
+      )
     })
   })
 
@@ -250,11 +252,11 @@ describe('Search Store', () => {
     it('should apply text search AND territory filter', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
       searchStore.setQuery('Kaiti')
       searchStore.setFilter('territory', 'littleton')
-      
+
       expect(searchStore.results).toHaveLength(1)
       expect(searchStore.results[0].salesRep).toBe('Kaiti Green')
       expect(searchStore.results[0].territory).toBe('littleton')
@@ -263,11 +265,11 @@ describe('Search Store', () => {
     it('should apply multiple filters together', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
       searchStore.setFilter('salesRep', 'Kaiti Green')
       searchStore.setFilter('minSales', 2000)
-      
+
       expect(searchStore.results).toHaveLength(1)
       expect(searchStore.results[0].accountName).toBe('4EYMED LLC')
     })
@@ -275,11 +277,11 @@ describe('Search Store', () => {
     it('should return empty results when filters conflict', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
       searchStore.setFilter('territory', 'highlands-ranch')
       searchStore.setFilter('salesRep', 'Kaiti Green')
-      
+
       expect(searchStore.results).toHaveLength(0)
     })
   })
@@ -288,13 +290,13 @@ describe('Search Store', () => {
     it('should clear individual filters', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
       searchStore.setFilter('territory', 'colorado-springs-north')
       searchStore.setFilter('salesRep', 'Kaiti Green')
-      
+
       expect(searchStore.results).toHaveLength(1)
-      
+
       searchStore.setFilter('territory', undefined)
       expect(searchStore.results).toHaveLength(2) // Both Kaiti Green customers
     })
@@ -302,16 +304,16 @@ describe('Search Store', () => {
     it('should clear all filters', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
       searchStore.setQuery('4EYMED')
       searchStore.setFilter('territory', 'colorado-springs-north')
-      
+
       expect(searchStore.results).toHaveLength(1)
-      
+
       searchStore.clearFilters()
       expect(searchStore.results).toHaveLength(1) // Query still active
-      
+
       searchStore.clearAll()
       expect(searchStore.results).toHaveLength(3) // All customers
     })
@@ -319,20 +321,20 @@ describe('Search Store', () => {
     it('should handle null and empty string filter values', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
-      
+
       // These should all clear the filter
       searchStore.setFilter('territory', 'colorado-springs-north')
       expect(searchStore.filters.territory).toBe('colorado-springs-north')
-      
+
       searchStore.setFilter('territory', null)
       expect(searchStore.filters.territory).toBeUndefined()
-      
+
       searchStore.setFilter('territory', 'colorado-springs-north')
       searchStore.setFilter('territory', '')
       expect(searchStore.filters.territory).toBeUndefined()
-      
+
       searchStore.setFilter('territory', 'colorado-springs-north')
       searchStore.setFilter('territory', undefined)
       expect(searchStore.filters.territory).toBeUndefined()
@@ -342,41 +344,41 @@ describe('Search Store', () => {
   describe('Active Search Detection', () => {
     it('should detect active search query', () => {
       const searchStore = useSearchStore()
-      
+
       expect(searchStore.hasActiveSearch).toBe(false)
-      
+
       searchStore.setQuery('test')
       expect(searchStore.hasActiveSearch).toBe(true)
-      
+
       searchStore.setQuery('')
       expect(searchStore.hasActiveSearch).toBe(false)
-      
+
       searchStore.setQuery('   ')
       expect(searchStore.hasActiveSearch).toBe(false)
     })
 
     it('should detect active filters', () => {
       const searchStore = useSearchStore()
-      
+
       expect(searchStore.hasActiveSearch).toBe(false)
-      
+
       searchStore.setFilter('territory', 'colorado-springs-north')
       expect(searchStore.hasActiveSearch).toBe(true)
-      
+
       searchStore.clearFilters()
       expect(searchStore.hasActiveSearch).toBe(false)
     })
 
     it('should detect combination of query and filters', () => {
       const searchStore = useSearchStore()
-      
+
       searchStore.setQuery('test')
       searchStore.setFilter('territory', 'colorado-springs-north')
       expect(searchStore.hasActiveSearch).toBe(true)
-      
+
       searchStore.setQuery('')
       expect(searchStore.hasActiveSearch).toBe(true) // Filter still active
-      
+
       searchStore.clearFilters()
       expect(searchStore.hasActiveSearch).toBe(false)
     })
@@ -386,37 +388,37 @@ describe('Search Store', () => {
     it('should handle empty customer list', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = []
       searchStore.setQuery('anything')
-      
+
       expect(searchStore.results).toHaveLength(0)
     })
 
     it('should handle special characters in search', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
       searchStore.setQuery('4EYMED LLC')
-      
+
       expect(searchStore.results).toHaveLength(1)
     })
 
     it('should handle zero sales values', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       const customerWithZeroSales: Customer = {
         ...mockCustomers[0],
-        totalSales: 0
+        totalSales: 0,
       }
-      
+
       territoryStore.customers = [customerWithZeroSales]
       searchStore.setFilter('minSales', 0)
-      
+
       expect(searchStore.results).toHaveLength(1)
-      
+
       searchStore.setFilter('minSales', 1)
       expect(searchStore.results).toHaveLength(0)
     })
@@ -424,23 +426,26 @@ describe('Search Store', () => {
     it('should maintain filter state when customer data changes', () => {
       const territoryStore = useTerritoryStore()
       const searchStore = useSearchStore()
-      
+
       territoryStore.customers = mockCustomers
       searchStore.setFilter('territory', 'colorado-springs-north')
-      
+
       expect(searchStore.results).toHaveLength(1)
-      
+
       // Simulate data refresh
-      territoryStore.customers = [...mockCustomers, {
-        ...mockCustomers[0],
-        id: 'cn999999',
-        customerNumber: 'CN999999',
-        accountName: 'New Customer'
-      }]
-      
+      territoryStore.customers = [
+        ...mockCustomers,
+        {
+          ...mockCustomers[0],
+          id: 'cn999999',
+          customerNumber: 'CN999999',
+          accountName: 'New Customer',
+        },
+      ]
+
       // Filter should still be active and apply to new data
       expect(searchStore.results).toHaveLength(2)
-      expect(searchStore.results.every(c => c.territory === 'colorado-springs-north')).toBe(true)
+      expect(searchStore.results.every((c) => c.territory === 'colorado-springs-north')).toBe(true)
     })
   })
 })

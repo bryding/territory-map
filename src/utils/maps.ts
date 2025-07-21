@@ -4,10 +4,10 @@
 
 export function openInMaps(address: string): void {
   const encodedAddress = encodeURIComponent(address)
-  
+
   // Detect iOS
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
-  
+
   if (isIOS) {
     // Try iOS Maps first
     const iosUrl = `maps://maps.apple.com/?address=${encodedAddress}`

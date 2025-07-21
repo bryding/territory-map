@@ -3,15 +3,21 @@
     <div class="loader-card">
       <h2>Load Territory Data</h2>
       <p>Upload your CSV file to load customer and sales data.</p>
-      
-      <div class="upload-area" @click="triggerFileInput" @drop="handleDrop" @dragover.prevent @dragenter.prevent>
-        <input 
-          ref="fileInput" 
-          type="file" 
-          accept=".csv" 
-          @change="handleFileSelect" 
-          style="display: none;"
-        >
+
+      <div
+        class="upload-area"
+        @click="triggerFileInput"
+        @drop="handleDrop"
+        @dragover.prevent
+        @dragenter.prevent
+      >
+        <input
+          ref="fileInput"
+          type="file"
+          accept=".csv"
+          @change="handleFileSelect"
+          style="display: none"
+        />
         <div class="upload-icon">📄</div>
         <p>Click to select CSV file or drag and drop</p>
         <small>Supports .csv files</small>
@@ -87,7 +93,7 @@ async function processFile(file: File) {
 async function loadSampleData() {
   loading.value = true
   error.value = null
-  
+
   try {
     const success = await loadTestData()
     if (!success) {
@@ -182,8 +188,12 @@ function clearError() {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .error {
@@ -264,7 +274,7 @@ function clearError() {
     align-items: flex-start;
     padding-top: 2rem;
   }
-  
+
   .loader-card {
     padding: 2rem 1.5rem;
     max-width: none;
@@ -283,7 +293,7 @@ function clearError() {
     line-height: 1.5;
     margin-bottom: 2rem;
   }
-  
+
   .upload-area {
     padding: 2.5rem 1.5rem;
     margin-bottom: 1.5rem;

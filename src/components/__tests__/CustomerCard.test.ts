@@ -6,7 +6,7 @@ import type { Customer } from '@/types'
 // Mock window.open for maps testing
 Object.defineProperty(window, 'open', {
   value: vi.fn(),
-  writable: true
+  writable: true,
 })
 
 const mockCustomer: Customer = {
@@ -19,15 +19,15 @@ const mockCustomer: Customer = {
   notes: {
     general: 'Good customer relationship',
     contact: 'Prefers email contact',
-    product: 'Interested in SkinPen expansion'
+    product: 'Interested in SkinPen expansion',
   },
   salesData: {
     daxxify: { salesByPeriod: { '2024-Q1': 1000, '2024-Q2': 1200 } },
     rha: { salesByPeriod: { '2024-Q1': 500 } },
-    skinPen: { salesByPeriod: { '2024-Q2': 1632, '2024-Q4': 1728, '2025-Q1': 1488 } }
+    skinPen: { salesByPeriod: { '2024-Q2': 1632, '2024-Q4': 1728, '2025-Q1': 1488 } },
   },
   isQ3PromoTarget: true,
-  totalSales: 6548
+  totalSales: 6548,
 }
 
 const mockCustomerMinimal: Customer = {
@@ -41,17 +41,17 @@ const mockCustomerMinimal: Customer = {
   salesData: {
     daxxify: { salesByPeriod: {} },
     rha: { salesByPeriod: {} },
-    skinPen: { salesByPeriod: {} }
+    skinPen: { salesByPeriod: {} },
   },
   isQ3PromoTarget: false,
-  totalSales: 0
+  totalSales: 0,
 }
 
 describe('CustomerCard Component', () => {
   describe('Customer Information Display', () => {
     it('should display customer basic information correctly', () => {
       const wrapper = mount(CustomerCard, {
-        props: { customer: mockCustomer }
+        props: { customer: mockCustomer },
       })
 
       expect(wrapper.text()).toContain('4EYMED LLC')
@@ -61,7 +61,7 @@ describe('CustomerCard Component', () => {
 
     it('should format total sales with currency', () => {
       const wrapper = mount(CustomerCard, {
-        props: { customer: mockCustomer }
+        props: { customer: mockCustomer },
       })
 
       expect(wrapper.text()).toContain('6,548') // Formatted without decimals
@@ -69,7 +69,7 @@ describe('CustomerCard Component', () => {
 
     it('should handle customers with zero sales', () => {
       const wrapper = mount(CustomerCard, {
-        props: { customer: mockCustomerMinimal }
+        props: { customer: mockCustomerMinimal },
       })
 
       expect(wrapper.text()).toContain('0') // Should show 0 for no sales
@@ -80,7 +80,7 @@ describe('CustomerCard Component', () => {
   describe('Q3 Promo Target Indicator', () => {
     it('should show Q3 promo target indicator when applicable', () => {
       const wrapper = mount(CustomerCard, {
-        props: { customer: mockCustomer }
+        props: { customer: mockCustomer },
       })
 
       // Should have promo target indicator (🎯 emoji)
@@ -91,7 +91,7 @@ describe('CustomerCard Component', () => {
 
     it('should not show Q3 promo target indicator for non-targets', () => {
       const wrapper = mount(CustomerCard, {
-        props: { customer: mockCustomerMinimal }
+        props: { customer: mockCustomerMinimal },
       })
 
       expect(wrapper.text()).not.toContain('🎯')
@@ -103,13 +103,13 @@ describe('CustomerCard Component', () => {
   describe('Sales Data Display', () => {
     it('should display product sales data correctly', () => {
       const wrapper = mount(CustomerCard, {
-        props: { customer: mockCustomer }
+        props: { customer: mockCustomer },
       })
 
       // Should show product sales
       const salesSection = wrapper.find('.sales-data')
       expect(salesSection.exists()).toBe(true)
-      
+
       // Should show DAXXIFY, RHA, and SkinPen sales
       expect(wrapper.text()).toContain('DAXXIFY:')
       expect(wrapper.text()).toContain('RHA:')
@@ -118,7 +118,7 @@ describe('CustomerCard Component', () => {
 
     it('should handle empty sales data gracefully', () => {
       const wrapper = mount(CustomerCard, {
-        props: { customer: mockCustomerMinimal }
+        props: { customer: mockCustomerMinimal },
       })
 
       // Should not crash with empty sales data
@@ -128,7 +128,7 @@ describe('CustomerCard Component', () => {
 
     it('should calculate and display latest quarter performance', () => {
       const wrapper = mount(CustomerCard, {
-        props: { customer: mockCustomer }
+        props: { customer: mockCustomer },
       })
 
       // Should show some form of recent performance data
@@ -144,12 +144,12 @@ describe('CustomerCard Component', () => {
 
     it('should handle maps button click correctly', async () => {
       const wrapper = mount(CustomerCard, {
-        props: { customer: mockCustomer }
+        props: { customer: mockCustomer },
       })
 
       // The entire card is clickable for maps
       await wrapper.trigger('click')
-      
+
       // Should attempt to open maps with correct address (URL encoded)
       expect(window.open).toHaveBeenCalled()
       const mockOpen = vi.mocked(window.open)
@@ -158,7 +158,7 @@ describe('CustomerCard Component', () => {
 
     it('should generate correct iOS Maps URL', () => {
       const wrapper = mount(CustomerCard, {
-        props: { customer: mockCustomer }
+        props: { customer: mockCustomer },
       })
 
       // Test that the component has the openMaps functionality
@@ -170,11 +170,11 @@ describe('CustomerCard Component', () => {
     it('should handle addresses with special characters', () => {
       const specialAddressCustomer: Customer = {
         ...mockCustomer,
-        businessAddress: '123 Main St, Suite #100, Denver, CO 80202'
+        businessAddress: '123 Main St, Suite #100, Denver, CO 80202',
       }
 
       const wrapper = mount(CustomerCard, {
-        props: { customer: specialAddressCustomer }
+        props: { customer: specialAddressCustomer },
       })
 
       expect(wrapper.text()).toContain('123 Main St, Suite #100, Denver, CO 80202')
@@ -184,25 +184,25 @@ describe('CustomerCard Component', () => {
   describe('Notes Display', () => {
     it('should display customer notes when present', async () => {
       const wrapper = mount(CustomerCard, {
-        props: { customer: mockCustomer }
+        props: { customer: mockCustomer },
       })
 
       // Should show notes section with toggle button
       const notesSection = wrapper.find('.notes-section')
       expect(notesSection.exists()).toBe(true)
-      
+
       // Should show notes toggle button
       const notesToggle = wrapper.find('.notes-toggle')
       expect(notesToggle.exists()).toBe(true)
       expect(notesToggle.text()).toContain('Notes')
-      
+
       // Notes content should exist but not be visible initially
       const notesContent = wrapper.find('.notes-content')
       expect(notesContent.exists()).toBe(true)
-      
+
       // Click to expand notes
       await notesToggle.trigger('click')
-      
+
       // Notes content should now be displayed
       await wrapper.vm.$nextTick()
       expect(wrapper.text()).toContain('Good customer relationship')
@@ -212,12 +212,12 @@ describe('CustomerCard Component', () => {
 
     it('should handle customers without notes', () => {
       const wrapper = mount(CustomerCard, {
-        props: { customer: mockCustomerMinimal }
+        props: { customer: mockCustomerMinimal },
       })
 
       // Should not crash when no notes present
       expect(wrapper.exists()).toBe(true)
-      
+
       // Should not show notes section when no notes exist
       const notesSection = wrapper.find('.notes-section')
       expect(notesSection.exists()).toBe(false)
@@ -225,18 +225,18 @@ describe('CustomerCard Component', () => {
 
     it('should display different types of notes separately', async () => {
       const wrapper = mount(CustomerCard, {
-        props: { customer: mockCustomer }
+        props: { customer: mockCustomer },
       })
 
       // Test the notes are properly structured
       expect(mockCustomer.notes.general).toBe('Good customer relationship')
       expect(mockCustomer.notes.contact).toBe('Prefers email contact')
       expect(mockCustomer.notes.product).toBe('Interested in SkinPen expansion')
-      
+
       // Expand notes to check categorization
       const notesToggle = wrapper.find('.notes-toggle')
       await notesToggle.trigger('click')
-      
+
       // Check that different note types are labeled correctly
       expect(wrapper.text()).toContain('General:')
       expect(wrapper.text()).toContain('Contact:')
@@ -247,7 +247,7 @@ describe('CustomerCard Component', () => {
   describe('Territory Display', () => {
     it('should display territory information correctly', () => {
       const wrapper = mount(CustomerCard, {
-        props: { customer: mockCustomer }
+        props: { customer: mockCustomer },
       })
 
       // Should display territory information properly
@@ -260,7 +260,7 @@ describe('CustomerCard Component', () => {
     it('should require customer prop', () => {
       // This test ensures the component properly requires the customer prop
       const wrapper = mount(CustomerCard, {
-        props: { customer: mockCustomer }
+        props: { customer: mockCustomer },
       })
 
       expect(wrapper.props('customer')).toEqual(mockCustomer)
@@ -268,7 +268,7 @@ describe('CustomerCard Component', () => {
 
     it('should handle customer prop changes reactively', async () => {
       const wrapper = mount(CustomerCard, {
-        props: { customer: mockCustomer }
+        props: { customer: mockCustomer },
       })
 
       expect(wrapper.text()).toContain('4EYMED LLC')
@@ -283,7 +283,7 @@ describe('CustomerCard Component', () => {
   describe('Responsive Design', () => {
     it('should maintain proper structure for mobile screens', () => {
       const wrapper = mount(CustomerCard, {
-        props: { customer: mockCustomer }
+        props: { customer: mockCustomer },
       })
 
       // Should have proper CSS classes for responsive design
@@ -294,11 +294,11 @@ describe('CustomerCard Component', () => {
     it('should handle long customer names gracefully', () => {
       const longNameCustomer: Customer = {
         ...mockCustomer,
-        accountName: 'Very Long Customer Name That Should Not Break The Layout When Displayed'
+        accountName: 'Very Long Customer Name That Should Not Break The Layout When Displayed',
       }
 
       const wrapper = mount(CustomerCard, {
-        props: { customer: longNameCustomer }
+        props: { customer: longNameCustomer },
       })
 
       expect(wrapper.text()).toContain('Very Long Customer Name')
@@ -309,12 +309,12 @@ describe('CustomerCard Component', () => {
   describe('Performance and Memory', () => {
     it('should not cause memory leaks with frequent re-renders', () => {
       const wrapper = mount(CustomerCard, {
-        props: { customer: mockCustomer }
+        props: { customer: mockCustomer },
       })
 
       // Simulate multiple prop changes
       const customers = [mockCustomer, mockCustomerMinimal, mockCustomer]
-      
+
       customers.forEach(async (customer) => {
         await wrapper.setProps({ customer })
         expect(wrapper.exists()).toBe(true)
@@ -325,18 +325,18 @@ describe('CustomerCard Component', () => {
       const largeSalesCustomer: Customer = {
         ...mockCustomer,
         salesData: {
-          daxxify: { 
+          daxxify: {
             salesByPeriod: Object.fromEntries(
-              Array.from({ length: 20 }, (_, i) => [`2024-Q${(i % 4) + 1}`, Math.random() * 1000])
-            )
+              Array.from({ length: 20 }, (_, i) => [`2024-Q${(i % 4) + 1}`, Math.random() * 1000]),
+            ),
           },
           rha: { salesByPeriod: {} },
-          skinPen: { salesByPeriod: {} }
-        }
+          skinPen: { salesByPeriod: {} },
+        },
       }
 
       const wrapper = mount(CustomerCard, {
-        props: { customer: largeSalesCustomer }
+        props: { customer: largeSalesCustomer },
       })
 
       expect(wrapper.exists()).toBe(true)

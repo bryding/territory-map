@@ -15,38 +15,41 @@ export const useSearchStore = defineStore('search', () => {
   const results = computed((): Customer[] => {
     const searchQuery = query.value.toLowerCase().trim()
     const activeFilters = filters.value
-    
+
     let filteredCustomers = territoryStore.customers
 
     // Apply text search
     if (searchQuery) {
-      filteredCustomers = filteredCustomers.filter(customer => 
-        customer.accountName.toLowerCase().includes(searchQuery) ||
-        customer.customerNumber.toLowerCase().includes(searchQuery) ||
-        customer.salesRep.toLowerCase().includes(searchQuery) ||
-        customer.businessAddress.toLowerCase().includes(searchQuery)
+      filteredCustomers = filteredCustomers.filter(
+        (customer) =>
+          customer.accountName.toLowerCase().includes(searchQuery) ||
+          customer.customerNumber.toLowerCase().includes(searchQuery) ||
+          customer.salesRep.toLowerCase().includes(searchQuery) ||
+          customer.businessAddress.toLowerCase().includes(searchQuery),
       )
     }
 
     // Apply filters
     if (activeFilters.territory) {
-      filteredCustomers = filteredCustomers.filter(c => c.territory === activeFilters.territory)
+      filteredCustomers = filteredCustomers.filter((c) => c.territory === activeFilters.territory)
     }
 
     if (activeFilters.salesRep) {
-      filteredCustomers = filteredCustomers.filter(c => c.salesRep === activeFilters.salesRep)
+      filteredCustomers = filteredCustomers.filter((c) => c.salesRep === activeFilters.salesRep)
     }
 
     if (activeFilters.isQ3PromoTarget !== undefined) {
-      filteredCustomers = filteredCustomers.filter(c => c.isQ3PromoTarget === activeFilters.isQ3PromoTarget)
+      filteredCustomers = filteredCustomers.filter(
+        (c) => c.isQ3PromoTarget === activeFilters.isQ3PromoTarget,
+      )
     }
 
     if (activeFilters.minSales !== undefined) {
-      filteredCustomers = filteredCustomers.filter(c => c.totalSales >= activeFilters.minSales!)
+      filteredCustomers = filteredCustomers.filter((c) => c.totalSales >= activeFilters.minSales!)
     }
 
     if (activeFilters.maxSales !== undefined) {
-      filteredCustomers = filteredCustomers.filter(c => c.totalSales <= activeFilters.maxSales!)
+      filteredCustomers = filteredCustomers.filter((c) => c.totalSales <= activeFilters.maxSales!)
     }
 
     return filteredCustomers
@@ -83,15 +86,15 @@ export const useSearchStore = defineStore('search', () => {
     // State
     query,
     filters,
-    
+
     // Computed
     results,
     hasActiveSearch,
-    
+
     // Actions
     setQuery,
     setFilter,
     clearFilters,
-    clearAll
+    clearAll,
   }
 })

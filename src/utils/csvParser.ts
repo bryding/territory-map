@@ -1,5 +1,12 @@
 import Papa from 'papaparse'
-import type { CSVRow, Customer, ProductBrand, QuarterlySales, CustomerNotes, Territory } from '@/types'
+import type {
+  CSVRow,
+  Customer,
+  ProductBrand,
+  QuarterlySales,
+  CustomerNotes,
+  Territory,
+} from '@/types'
 import { CSVQuarterDetector, SalesUtils } from './salesUtils'
 import { KNOWN_SALES_REPS, TERRITORIES } from './common'
 
@@ -22,7 +29,6 @@ export interface ParseMeta {
   quarterColumns: Array<{ original: string; standardized: string }>
 }
 
-
 export class CSVParser {
   private static readonly REQUIRED_COLUMNS = ['PAC', 'Brand'] as const
 
@@ -33,7 +39,7 @@ export class CSVParser {
     return new Promise((resolve) => {
       const errors: ParseError[] = []
       const customers: Customer[] = []
-      
+
       Papa.parse<CSVRow>(csvText, {
         header: true,
         skipEmptyLines: true,
@@ -43,17 +49,17 @@ export class CSVParser {
           const quarterColumns = CSVQuarterDetector.getQuarterColumns(results.meta?.fields || [])
           const meta: ParseMeta = {
             totalRows: 0, // Will be set later
-            validRows: 0, // Will be set later  
-            quarterColumns
+            validRows: 0, // Will be set later
+            quarterColumns,
           }
-          
+
           // Validate required columns exist
           const missingColumns = this.validateRequiredColumns(results.meta?.fields || [])
           if (missingColumns.length > 0) {
             errors.push({
               row: 0,
               message: `Missing required columns: ${missingColumns.join(', ')}`,
-              code: 'MISSING_COLUMNS'
+              code: 'MISSING_COLUMNS',
             })
             resolve({ data: [], errors, meta })
             return
@@ -61,7 +67,7 @@ export class CSVParser {
 
           // Group rows by customer and process
           const customerGroups = this.groupRowsByCustomer(results.data, errors)
-          
+
           for (const [customerKey, rows] of customerGroups.entries()) {
             try {
               const customer = this.processCustomerGroup(customerKey, rows, quarterColumns)
@@ -72,7 +78,7 @@ export class CSVParser {
               errors.push({
                 row: rows[0]?.rowIndex || 0,
                 message: `Failed to process customer: ${error instanceof Error ? error.message : 'Unknown error'}`,
-                code: 'CUSTOMER_PROCESSING_ERROR'
+                code: 'CUSTOMER_PROCESSING_ERROR',
               })
             }
           }
@@ -83,16 +89,16 @@ export class CSVParser {
           resolve({
             data: customers,
             errors,
-            meta
+            meta,
           })
         },
         error: (error: Error) => {
           resolve({
             data: [],
             errors: [{ row: 0, message: error.message, code: 'PARSE_ERROR' }],
-            meta: { totalRows: 0, validRows: 0, quarterColumns: [] }
+            meta: { totalRows: 0, validRows: 0, quarterColumns: [] },
           })
-        }
+        },
       })
     })
   }
@@ -101,7 +107,10 @@ export class CSVParser {
    * Normalizes CSV headers to consistent format
    */
   private static normalizeHeader(header: string): string {
-    const normalized = header.trim().toLowerCase().replace(/[^a-z0-9]/g, '_')
+    const normalized = header
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '_')
     // Map specific CSV columns to expected names
     if (normalized === 'i') return 'accountName'
     if (normalized === 'account_name__cn_' || normalized === 'account_name_cn') return 'accountName'
@@ -113,22 +122,21 @@ export class CSVParser {
    * Validates that required columns are present
    */
   private static validateRequiredColumns(headers: string[]): string[] {
-    const normalizedHeaders = headers.map(h => this.normalizeHeader(h))
-    return this.REQUIRED_COLUMNS.filter(col => 
-      !normalizedHeaders.includes(this.normalizeHeader(col))
+    const normalizedHeaders = headers.map((h) => this.normalizeHeader(h))
+    return this.REQUIRED_COLUMNS.filter(
+      (col) => !normalizedHeaders.includes(this.normalizeHeader(col)),
     )
   }
-
 
   /**
    * Groups CSV rows by customer (account name)
    */
   private static groupRowsByCustomer(
-    rows: CSVRow[], 
-    errors: ParseError[]
+    rows: CSVRow[],
+    errors: ParseError[],
   ): Map<string, Array<CSVRow & { rowIndex: number }>> {
     const groups = new Map<string, Array<CSVRow & { rowIndex: number }>>()
-    
+
     rows.forEach((row, index) => {
       // Skip total rows and empty rows
       const accountName = row.accountName || row.accountname
@@ -142,7 +150,7 @@ export class CSVParser {
           row: index + 2, // +2 for header and 1-based indexing
           field: 'pac',
           message: `Unknown sales representative: ${row.pac}`,
-          code: 'INVALID_SALES_REP'
+          code: 'INVALID_SALES_REP',
         })
       }
 
@@ -152,7 +160,7 @@ export class CSVParser {
           row: index + 2,
           field: 'accountName',
           message: `Could not extract customer number from: ${accountName}`,
-          code: 'INVALID_CUSTOMER_NUMBER'
+          code: 'INVALID_CUSTOMER_NUMBER',
         })
         return
       }
@@ -160,7 +168,9 @@ export class CSVParser {
       if (!groups.has(customerKey)) {
         groups.set(customerKey, [])
       }
-      const rowWithIndex = Object.assign({}, row, { rowIndex: index + 2 }) as CSVRow & { rowIndex: number }
+      const rowWithIndex = Object.assign({}, row, { rowIndex: index + 2 }) as CSVRow & {
+        rowIndex: number
+      }
       groups.get(customerKey)!.push(rowWithIndex)
     })
 
@@ -196,7 +206,7 @@ export class CSVParser {
   private static processCustomerGroup(
     customerKey: string,
     rows: Array<CSVRow & { rowIndex: number }>,
-    quarterColumns: Array<{ original: string; standardized: string }>
+    quarterColumns: Array<{ original: string; standardized: string }>,
   ): Customer | null {
     if (rows.length === 0) return null
 
@@ -207,16 +217,16 @@ export class CSVParser {
       return null // Skip rows without account names
     }
     const accountName = this.cleanAccountName(rawAccountName)
-    
+
     // Aggregate sales data by brand
     const salesByBrand = new Map<ProductBrand, QuarterlySales>()
-    
+
     for (const row of rows) {
       const brand = this.normalizeBrand(row.brand)
       if (!brand) continue
 
       const quarterlySales = this.extractQuarterlySales(row, quarterColumns)
-      
+
       if (!salesByBrand.has(brand)) {
         salesByBrand.set(brand, { salesByPeriod: {} })
       }
@@ -230,13 +240,15 @@ export class CSVParser {
 
     // Extract notes (combine from all rows)
     const notes = this.extractNotes(rows)
-    
+
     // Calculate total sales
-    const totalSales = Array.from(salesByBrand.values())
-      .reduce((sum, sales) => sum + SalesUtils.getTotalSales(sales), 0)
+    const totalSales = Array.from(salesByBrand.values()).reduce(
+      (sum, sales) => sum + SalesUtils.getTotalSales(sales),
+      0,
+    )
 
     const businessAddress = firstRow.address || this.extractBusinessAddress(accountName)
-    
+
     return {
       id: customerNumber.toLowerCase(),
       customerNumber,
@@ -248,10 +260,10 @@ export class CSVParser {
       salesData: {
         daxxify: salesByBrand.get('DAXXIFY') || { salesByPeriod: {} },
         rha: salesByBrand.get('RHA') || { salesByPeriod: {} },
-        skinPen: salesByBrand.get('SkinPen') || { salesByPeriod: {} }
+        skinPen: salesByBrand.get('SkinPen') || { salesByPeriod: {} },
       },
       isQ3PromoTarget: this.determineQ3PromoTarget(),
-      totalSales
+      totalSales,
     }
   }
 
@@ -284,7 +296,7 @@ export class CSVParser {
    */
   private static extractQuarterlySales(
     row: CSVRow,
-    quarterColumns: Array<{ original: string; standardized: string }>
+    quarterColumns: Array<{ original: string; standardized: string }>,
   ): QuarterlySales {
     const salesByPeriod: Record<string, number> = {}
 
@@ -315,18 +327,18 @@ export class CSVParser {
    */
   private static extractNotes(rows: Array<CSVRow & { rowIndex: number }>): CustomerNotes {
     const notes: CustomerNotes = {}
-    
+
     for (const row of rows) {
       // Map CSV fields to note types
       if (row.notes) notes.general = row.notes.trim()
       if (row.next_steps) notes.contact = row.next_steps.trim()
       if (row.skinpen_notes) notes.product = row.skinpen_notes.trim()
-      
+
       // Also check for contact field
       if (row.contact) {
         const contactInfo = row.contact.trim()
         if (contactInfo) {
-          notes.contact = notes.contact 
+          notes.contact = notes.contact
             ? `${notes.contact}. Contact: ${contactInfo}`
             : `Contact: ${contactInfo}`
         }
@@ -357,27 +369,36 @@ export class CSVParser {
     }
 
     const addressLower = address.toLowerCase()
-    
+
     // Map based on address content
     if (addressLower.includes('highlands ranch')) return 'highlands-ranch'
     if (addressLower.includes('littleton')) return 'littleton'
-    if (addressLower.includes('castle rock') || addressLower.includes('castle pines')) return 'castle-rock'
-    
+    if (addressLower.includes('castle rock') || addressLower.includes('castle pines'))
+      return 'castle-rock'
+
     // Colorado Springs territory mapping based on common area indicators
     if (addressLower.includes('colorado springs')) {
-      if (addressLower.includes('academy') || addressLower.includes('austin bluffs') || 
-          addressLower.includes('research') || addressLower.includes('80918') || 
-          addressLower.includes('80920')) {
+      if (
+        addressLower.includes('academy') ||
+        addressLower.includes('austin bluffs') ||
+        addressLower.includes('research') ||
+        addressLower.includes('80918') ||
+        addressLower.includes('80920')
+      ) {
         return 'colorado-springs-north'
       }
-      if (addressLower.includes('nevada') || addressLower.includes('80907') || 
-          addressLower.includes('downtown') || addressLower.includes('tejon')) {
+      if (
+        addressLower.includes('nevada') ||
+        addressLower.includes('80907') ||
+        addressLower.includes('downtown') ||
+        addressLower.includes('tejon')
+      ) {
         return 'colorado-springs-central'
       }
       // Default to south for other Colorado Springs addresses
       return 'colorado-springs-south'
     }
-    
+
     // Default fallback
     return 'colorado-springs-central'
   }

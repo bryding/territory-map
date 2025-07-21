@@ -6,43 +6,43 @@
         <span class="customer-number">{{ customer.customerNumber }}</span>
         <span v-if="customer.isQ3PromoTarget" class="promo-badge">🎯</span>
       </div>
-      <div class="total-sales">
-        ${{ formatCurrency(customer.totalSales) }}
-      </div>
+      <div class="total-sales">${{ formatCurrency(customer.totalSales) }}</div>
     </div>
-    
+
     <div class="card-body">
       <div class="address">
         <span class="address-icon">📍</span>
         {{ customer.businessAddress }}
       </div>
-      
+
       <div class="sales-data">
         <div v-if="SalesUtils.getTotalSales(customer.salesData.daxxify) > 0" class="product-sales">
           <span class="product-name">DAXXIFY:</span>
-          <span class="sales-amount">${{ formatCurrency(SalesUtils.getTotalSales(customer.salesData.daxxify)) }}</span>
+          <span class="sales-amount"
+            >${{ formatCurrency(SalesUtils.getTotalSales(customer.salesData.daxxify)) }}</span
+          >
         </div>
         <div v-if="SalesUtils.getTotalSales(customer.salesData.rha) > 0" class="product-sales">
           <span class="product-name">RHA:</span>
-          <span class="sales-amount">${{ formatCurrency(SalesUtils.getTotalSales(customer.salesData.rha)) }}</span>
+          <span class="sales-amount"
+            >${{ formatCurrency(SalesUtils.getTotalSales(customer.salesData.rha)) }}</span
+          >
         </div>
         <div v-if="SalesUtils.getTotalSales(customer.salesData.skinPen) > 0" class="product-sales">
           <span class="product-name">SkinPen:</span>
-          <span class="sales-amount">${{ formatCurrency(SalesUtils.getTotalSales(customer.salesData.skinPen)) }}</span>
+          <span class="sales-amount"
+            >${{ formatCurrency(SalesUtils.getTotalSales(customer.salesData.skinPen)) }}</span
+          >
         </div>
       </div>
-      
+
       <div v-if="hasNotes" class="notes-section">
-        <button 
-          @click.stop="toggleNotes" 
-          class="notes-toggle"
-          :class="{ 'expanded': notesExpanded }"
-        >
+        <button @click.stop="toggleNotes" class="notes-toggle" :class="{ expanded: notesExpanded }">
           <span class="notes-icon">{{ notesExpanded ? '📝' : '💬' }}</span>
           <span class="notes-label">Notes</span>
           <span class="expand-icon">{{ notesExpanded ? '▼' : '▶' }}</span>
         </button>
-        
+
         <div v-show="notesExpanded" class="notes-content">
           <div v-if="customer.notes.general" class="note">
             <strong>General:</strong> {{ customer.notes.general }}
@@ -74,7 +74,11 @@ const props = defineProps<Props>()
 const notesExpanded = ref(false)
 
 const hasNotes = computed(() => {
-  return !!(props.customer.notes.general || props.customer.notes.contact || props.customer.notes.product)
+  return !!(
+    props.customer.notes.general ||
+    props.customer.notes.contact ||
+    props.customer.notes.product
+  )
 })
 
 function openMaps() {
@@ -251,14 +255,14 @@ function toggleNotes() {
     padding: 1.25rem 1rem;
     min-height: 60px; /* iOS touch target minimum with more breathing room */
   }
-  
+
   .card-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.75rem;
     margin-bottom: 1rem;
   }
-  
+
   .account-info {
     flex-wrap: wrap;
     gap: 0.75rem;
@@ -285,7 +289,7 @@ function toggleNotes() {
     margin-bottom: 0.75rem;
     line-height: 1.4;
   }
-  
+
   .sales-data {
     flex-direction: column;
     gap: 0.5rem;
@@ -301,7 +305,7 @@ function toggleNotes() {
     padding: 0.75rem 0;
     min-height: 44px;
   }
-  
+
   .notes-content {
     padding: 0.75rem 0;
   }
@@ -311,7 +315,7 @@ function toggleNotes() {
     line-height: 1.4;
     margin-bottom: 0.75rem;
   }
-  
+
   .note:last-child {
     margin-bottom: 0;
   }
