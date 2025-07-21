@@ -18,40 +18,25 @@ A Progressive Web App (PWA) for sales territory management, optimized for iPhone
 - **Papa Parse** for CSV processing
 - **Vite** for fast development and building
 
-## Project Setup
+## Available Commands
 
 ```sh
-yarn
-```
+# Setup
+yarn                   # Install dependencies
 
-### Compile and Hot-Reload for Development
+# Development
+yarn dev              # Start development server
+yarn build            # Production build with type checking
+yarn build-only       # Vite build without type checking
+yarn preview          # Preview production build
 
-```sh
-yarn dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-yarn build
-```
-
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
-```sh
-yarn test:unit
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-yarn lint
-```
-
-### Format Code with Prettier
-
-```sh
-yarn format
+# Quality Assurance
+yarn ci               # Run full CI pipeline (type-check + lint + tests)
+yarn type-check       # TypeScript validation
+yarn lint             # ESLint with auto-fix
+yarn format           # Prettier code formatting
+yarn test:unit        # Run Vitest unit tests
+yarn test             # Alias for test:unit
 ```
 
 ## Getting Started
@@ -81,7 +66,13 @@ The app expects CSV files with sales representative data including:
 
 ### Testing
 
-Currently using manual testing. Unit tests with Vitest planned for Phase 2.
+Comprehensive test suite with 137 tests covering:
+- Store functionality (territory, search, integration)
+- CSV parsing and data validation  
+- Edge cases and performance scenarios
+- Business logic validation
+
+Run tests with `yarn test:unit` or full CI with `yarn ci`.
 
 ## Deployment
 
